@@ -726,7 +726,13 @@ function showErrorMessage(message) {
     
     // Form üstüne ekle
     const form = document.getElementById('applicationForm');
-    form.parentNode.insertBefore(errorDiv, form);
+    if (form && form.parentNode) {
+        form.parentNode.insertBefore(errorDiv, form);
+    } else {
+        // Eğer form bulunamazsa container'ın başına ekle
+        const container = document.querySelector('.container') || document.body;
+        container.insertBefore(errorDiv, container.firstChild);
+    }
     
     // Sayfa en üste kaydır
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -767,19 +773,25 @@ function showSuccessMessage() {
 }
 
 // Form verilerini localStorage'a kaydet
-function saveFormData(formData) {
-    const dataObject = {};
-    for (let [key, value] of formData.entries()) {
-        if (dataObject[key]) {
-            // Birden fazla değer varsa array'e çevir
-            if (Array.isArray(dataObject[key])) {
-                dataObject[key].push(value);
+function saveFormData(dataObject) {
+    // dataObject zaten bir JavaScript objesi, FormData değil
+    
+    // Eğer FormData ise objeye çevir
+    if (dataObject instanceof FormData) {
+        const convertedData = {};
+        for (let [key, value] of dataObject.entries()) {
+            if (convertedData[key]) {
+                // Birden fazla değer varsa array'e çevir
+                if (Array.isArray(convertedData[key])) {
+                    convertedData[key].push(value);
+                } else {
+                    convertedData[key] = [convertedData[key], value];
+                }
             } else {
-                dataObject[key] = [dataObject[key], value];
+                convertedData[key] = value;
             }
-        } else {
-            dataObject[key] = value;
         }
+        dataObject = convertedData;
     }
     
     dataObject.submissionDate = new Date().toISOString();
