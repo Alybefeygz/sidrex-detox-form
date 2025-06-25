@@ -724,14 +724,30 @@ function showErrorMessage(message) {
     `;
     errorDiv.textContent = message;
     
-    // Form üstüne ekle
-    const form = document.getElementById('applicationForm');
-    if (form && form.parentNode) {
-        form.parentNode.insertBefore(errorDiv, form);
-    } else {
-        // Eğer form bulunamazsa container'ın başına ekle
-        const container = document.querySelector('.container') || document.body;
-        container.insertBefore(errorDiv, container.firstChild);
+    // Güvenli ekleme stratejisi
+    try {
+        const form = document.getElementById('applicationForm');
+        if (form && form.parentNode) {
+            form.parentNode.insertBefore(errorDiv, form);
+        } else {
+            // Eğer form bulunamazsa farklı container'ları dene
+            const container = document.querySelector('.container') || 
+                            document.querySelector('main') || 
+                            document.querySelector('body') || 
+                            document.body;
+            
+            if (container && container.firstChild) {
+                container.insertBefore(errorDiv, container.firstChild);
+            } else if (container) {
+                container.appendChild(errorDiv);
+            } else {
+                document.body.appendChild(errorDiv);
+            }
+        }
+    } catch (error) {
+        console.error('Hata mesajı eklenemedi:', error);
+        // Son çare olarak body'ye ekle
+        document.body.appendChild(errorDiv);
     }
     
     // Sayfa en üste kaydır
@@ -739,8 +755,12 @@ function showErrorMessage(message) {
     
     // 10 saniye sonra mesajı kaldır
     setTimeout(() => {
-        if (errorDiv.parentNode) {
-            errorDiv.remove();
+        try {
+            if (errorDiv && errorDiv.parentNode) {
+                errorDiv.remove();
+            }
+        } catch (error) {
+            console.log('Hata mesajı kaldırılamadı:', error);
         }
     }, 10000);
 }
@@ -774,30 +794,35 @@ function showSuccessMessage() {
 
 // Form verilerini localStorage'a kaydet
 function saveFormData(dataObject) {
-    // dataObject zaten bir JavaScript objesi, FormData değil
-    
-    // Eğer FormData ise objeye çevir
-    if (dataObject instanceof FormData) {
-        const convertedData = {};
-        for (let [key, value] of dataObject.entries()) {
-            if (convertedData[key]) {
-                // Birden fazla değer varsa array'e çevir
-                if (Array.isArray(convertedData[key])) {
-                    convertedData[key].push(value);
-                } else {
-                    convertedData[key] = [convertedData[key], value];
-                }
-            } else {
-                convertedData[key] = value;
-            }
-        }
-        dataObject = convertedData;
-    }
-    
-    dataObject.submissionDate = new Date().toISOString();
-    
     try {
-        localStorage.setItem('applicationFormData', JSON.stringify(dataObject));
+        // dataObject'in tipini kontrol et
+        let finalData = {};
+        
+        // Eğer FormData ise objeye çevir
+        if (dataObject instanceof FormData) {
+            for (let [key, value] of dataObject.entries()) {
+                if (finalData[key]) {
+                    // Birden fazla değer varsa array'e çevir
+                    if (Array.isArray(finalData[key])) {
+                        finalData[key].push(value);
+                    } else {
+                        finalData[key] = [finalData[key], value];
+                    }
+                } else {
+                    finalData[key] = value;
+                }
+            }
+        } else if (typeof dataObject === 'object' && dataObject !== null) {
+            // Zaten bir obje ise direkt kullan
+            finalData = { ...dataObject };
+        } else {
+            console.error('saveFormData: Geçersiz veri tipi', typeof dataObject);
+            return;
+        }
+        
+        finalData.submissionDate = new Date().toISOString();
+        
+        localStorage.setItem('applicationFormData', JSON.stringify(finalData));
         console.log('Form verileri başarıyla kaydedildi.');
     } catch (error) {
         console.error('Form verileri kaydedilemedi:', error);
@@ -911,15 +936,21 @@ function loadSavedFormData() {
 // Sayfa kapatılırken uyarı ver (form doldurulduysa)
 window.addEventListener('beforeunload', function(e) {
     const form = document.getElementById('applicationForm');
+    if (!form) return;
+    
     const formData = new FormData(form);
     
     // Form doldurulmuş mu kontrol et
     let hasData = false;
-    for (let [key, value] of formData.entries()) {
-        if (value.trim() !== '') {
-            hasData = true;
-            break;
+    try {
+        for (let [key, value] of formData.entries()) {
+            if (value && value.toString().trim() !== '') {
+                hasData = true;
+                break;
+            }
         }
+    } catch (error) {
+        console.log('Form data kontrolünde hata:', error);
     }
     
     if (hasData) {
@@ -935,11 +966,13 @@ document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && e.key === 's') {
         e.preventDefault();
         const form = document.getElementById('applicationForm');
-        const formData = new FormData(form);
-        saveFormData(formData);
-        
-        // Bilgi mesajı göster
-        console.log('Form verileri kaydedildi (Ctrl+S)');
+        if (form) {
+            const formData = collectFormData(form); // FormData yerine collectFormData kullan
+            saveFormData(formData);
+            
+            // Bilgi mesajı göster
+            console.log('Form verileri kaydedildi (Ctrl+S)');
+        }
     }
     
     // Ctrl+R ile form sıfırla
