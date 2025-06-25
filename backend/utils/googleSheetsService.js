@@ -98,6 +98,8 @@ class GoogleSheetsService {
             const headers = [
                 'Timestamp',
                 'Ad Soyad',
+                'Telefon',
+                'E-posta',
                 'Yaş',
                 'Boy (cm)',
                 'Kilo (kg)',
@@ -124,11 +126,11 @@ class GoogleSheetsService {
                 'User Agent'
             ];
 
-            // Eğer header yok ise ekle
+            // Eğer header yok ise ekle veya mevcut header'ları güncelle
             if (!response.data.values || response.data.values.length === 0) {
                 await this.sheets.spreadsheets.values.update({
                     spreadsheetId: this.spreadsheetId,
-                    range: `${this.sheetName}!A1:Z1`,
+                    range: `${this.sheetName}!A1:AB1`,
                     valueInputOption: 'RAW',
                     requestBody: {
                         values: [headers]
@@ -136,6 +138,27 @@ class GoogleSheetsService {
                 });
 
                 logger.info('Headers added to Google Sheet');
+            } else {
+                // Mevcut header'ları kontrol et ve güncelle
+                const existingHeaders = response.data.values[0] || [];
+                const needsUpdate = !existingHeaders.includes('Telefon') || !existingHeaders.includes('E-posta');
+                
+                if (needsUpdate) {
+                    // Header'ları zorla güncelle
+                    await this.sheets.spreadsheets.values.update({
+                        spreadsheetId: this.spreadsheetId,
+                        range: `${this.sheetName}!A1:AB1`,
+                        valueInputOption: 'RAW',
+                        requestBody: {
+                            values: [headers]
+                        }
+                    });
+
+                    console.log('✅ Google Sheets headers updated with phone and email columns');
+                    logger.info('Headers updated in Google Sheet with phone and email columns');
+                } else {
+                    console.log('ℹ️ Google Sheets headers already include phone and email');
+                }
             }
 
         } catch (error) {
@@ -152,6 +175,8 @@ class GoogleSheetsService {
         return [
             timestamp,
             formData.fullName || '',
+            formData.phone || '',
+            formData.email || '',
             formData.age || '',
             formData.height || '',
             formData.weight || '',
@@ -199,7 +224,7 @@ class GoogleSheetsService {
 
             const response = await this.sheets.spreadsheets.values.append({
                 spreadsheetId: this.spreadsheetId,
-                range: `${this.sheetName}!A:X`,
+                range: `${this.sheetName}!A:AB`,
                 valueInputOption: 'RAW',
                 insertDataOption: 'INSERT_ROWS',
                 requestBody: {
@@ -228,7 +253,7 @@ class GoogleSheetsService {
         try {
             if (!this.initialized) await this.initializeAuth();
 
-            const queryRange = range || `${this.sheetName}!A:X`;
+            const queryRange = range || `${this.sheetName}!A:AB`;
 
             const response = await this.sheets.spreadsheets.values.get({
                 spreadsheetId: this.spreadsheetId,

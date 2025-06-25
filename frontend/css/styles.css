@@ -174,19 +174,11 @@ header h1 {
     font-weight: 700;
     font-size: 1.4rem;
     color: transparent;
-    background: var(--primary-gradient);
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
-    padding: 15px 30px;
-    border-radius: 50px;
-    border: 2px solid transparent;
-    background-clip: padding-box, text;
-    background-origin: padding-box, padding-box;
-    background-image: 
-        linear-gradient(white, white), 
-        var(--primary-gradient);
-    margin-bottom: 25px;
+    -webkit-text-fill-color: transparent;
+    padding: 15px;
     position: relative;
     display: inline-block;
 }
@@ -681,7 +673,7 @@ input:valid:not(:placeholder-shown) {
     
     .form-section legend {
         font-size: 1.2rem;
-        padding: 12px 20px;
+        padding: 15px;
     }
     
     input[type="text"],

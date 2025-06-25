@@ -13,8 +13,15 @@ const { authenticateAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
-// GoogleSheetsService instance'ı oluştur
-const googleSheetsService = new GoogleSheetsService();
+// GoogleSheetsService instance'ı oluştur (sadece yapılandırılmışsa)
+let googleSheetsService;
+try {
+    if (process.env.GOOGLE_SPREADSHEET_ID && process.env.GOOGLE_PRIVATE_KEY) {
+        googleSheetsService = new GoogleSheetsService();
+    }
+} catch (error) {
+    console.log('Google Sheets service başlatılamadı:', error.message);
+}
 
 // Çift gönderim koruması için cache
 const recentSubmissions = new Map();
@@ -56,17 +63,38 @@ const applicationValidation = [
         .isLength({ max: 200 })
         .withMessage('Meslek açıklaması en fazla 200 karakter olabilir'),
 
-    // Email validation (optional)
+    // Phone validation (required)
+    body('phone')
+        .notEmpty()
+        .withMessage('Telefon numarası zorunludur')
+        .customSanitizer(value => {
+            // Telefon numarasını temizle - sadece rakamları bırak
+            return value.replace(/\D/g, '');
+        })
+        .custom(value => {
+            // Türk telefon numarası formatlarını kontrol et
+            const cleanPhone = value.replace(/\D/g, '');
+            
+            // 11 haneli (05xxxxxxxxx) veya 13 haneli (+905xxxxxxxxx) olabilir
+            if (cleanPhone.length === 11 && cleanPhone.startsWith('05')) {
+                return true;
+            }
+            if (cleanPhone.length === 13 && cleanPhone.startsWith('905')) {
+                return true;
+            }
+            if (cleanPhone.length === 10 && cleanPhone.startsWith('5')) {
+                return true;
+            }
+            
+            throw new Error('Geçerli bir Türk telefon numarası giriniz (05XXXXXXXXX formatında)');
+        }),
+
+    // Email validation (required)
     body('email')
-        .optional()
+        .notEmpty()
+        .withMessage('E-posta adresi zorunludur')
         .isEmail()
         .withMessage('Geçerli bir email adresi giriniz'),
-
-    // Phone validation (optional)
-    body('phone')
-        .optional()
-        .isMobilePhone('tr-TR')
-        .withMessage('Geçerli bir telefon numarası giriniz'),
 ];
 
 // Yeni başvuru oluştur
@@ -156,11 +184,18 @@ router.post('/', applicationValidation, async (req, res) => {
             
             console.log('\n📊 Google Sheets\'e kaydedilecek veri:');
             console.log('Form Data:', JSON.stringify(req.body, null, 2));
+            console.log('Telefon:', req.body.phone);
+            console.log('Email:', req.body.email);
             console.log('Metadata:', JSON.stringify(metadata, null, 2));
             
-            const sheetsResult = await googleSheetsService.addFormData(req.body, metadata);
-            console.log('✅ Google Sheets başarılı:', sheetsResult);
-            logger.info('Form data saved to Google Sheets:', sheetsResult);
+            // Google Sheets sadece yapılandırılmışsa çalıştır
+            if (googleSheetsService && process.env.GOOGLE_SPREADSHEET_ID && process.env.GOOGLE_PRIVATE_KEY) {
+                const sheetsResult = await googleSheetsService.addFormData(req.body, metadata);
+                console.log('✅ Google Sheets başarılı:', sheetsResult);
+                logger.info('Form data saved to Google Sheets:', sheetsResult);
+            } else {
+                console.log('⚠️ Google Sheets yapılandırılmamış - sadece local kayıt');
+            }
         } catch (sheetsError) {
             console.log('❌ Google Sheets Hatası:', sheetsError.message);
             console.log('Stack:', sheetsError.stack);

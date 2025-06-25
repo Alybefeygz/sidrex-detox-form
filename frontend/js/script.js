@@ -408,6 +408,37 @@ function validateForm() {
         clearFieldError(ageField);
     }
     
+    // Telefon numarası kontrolü
+    const phoneField = document.getElementById('phone');
+    if (phoneField.value) {
+        // Telefon numarasını temizle (sadece rakamlar)
+        const cleanPhone = phoneField.value.replace(/\D/g, '');
+        
+        // Türk telefon numarası formatlarını kontrol et
+        const isValid10 = cleanPhone.length === 10 && cleanPhone.startsWith('5');  // 5xxxxxxxxx
+        const isValid11 = cleanPhone.length === 11 && cleanPhone.startsWith('05'); // 05xxxxxxxxx
+        const isValid13 = cleanPhone.length === 13 && cleanPhone.startsWith('905'); // 905xxxxxxxxx
+        
+        if (!isValid10 && !isValid11 && !isValid13) {
+            showFieldError(phoneField, 'Lütfen geçerli bir telefon numarası giriniz (05XX XXX XX XX formatında).');
+            isValid = false;
+        } else {
+            clearFieldError(phoneField);
+        }
+    }
+    
+    // Email kontrolü
+    const emailField = document.getElementById('email');
+    if (emailField.value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailField.value)) {
+            showFieldError(emailField, 'Lütfen geçerli bir e-posta adresi giriniz.');
+            isValid = false;
+        } else {
+            clearFieldError(emailField);
+        }
+    }
+    
     return isValid;
 }
 
@@ -694,6 +725,19 @@ function collectFormData(form) {
     
     data.aydinlatmaMetni = aydinlatmaMetni.checked ? 'Onaylandı' : 'Onaylanmadı';
     data.acikRizaMetni = acikRizaMetni.checked ? 'Onaylandı' : 'Onaylanmadı';
+    
+    // Telefon numarasını temizle
+    if (data.phone) {
+        // Sadece rakamları bırak
+        data.phone = data.phone.replace(/\D/g, '');
+        
+        // Türk telefon numarası formatına göre düzenle
+        if (data.phone.length === 10 && data.phone.startsWith('5')) {
+            data.phone = '0' + data.phone; // 5xxxxxxxxx -> 05xxxxxxxxx
+        } else if (data.phone.length === 13 && data.phone.startsWith('905')) {
+            data.phone = '0' + data.phone.substring(2); // 905xxxxxxxxx -> 05xxxxxxxxx
+        }
+    }
     
     // Sayısal alanları number tipine çevir
     const numberFields = ['age', 'height', 'weight'];

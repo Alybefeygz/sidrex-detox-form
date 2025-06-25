@@ -139,7 +139,7 @@
             <div class="loading" id="loadingText">Form yükleniyor...</div>
             <iframe 
                 id="formIframe" 
-                src="iframe-content.html" 
+                src="iframe-content.html?v=2024" 
                 title="Başvuru Formu"
                 onload="hideLoading()"
                 sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-modals">
@@ -159,6 +159,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             const iframe = document.getElementById('formIframe');
             
+            // Cache'i bypass etmek için timestamp ekle
+            const timestamp = new Date().getTime();
+            iframe.src = `iframe-content.html?v=${timestamp}`;
+            
             // Iframe yükleme timeout kontrolü
             setTimeout(function() {
                 hideLoading();
@@ -174,6 +178,15 @@
 
             window.addEventListener('resize', adjustIframeHeight);
             adjustIframeHeight();
+            
+            // Manuel yenileme için keyboard shortcut
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'r') {
+                    e.preventDefault();
+                    const newTimestamp = new Date().getTime();
+                    iframe.src = `iframe-content.html?v=${newTimestamp}`;
+                }
+            });
         });
 
         // Error handling
