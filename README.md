@@ -57,7 +57,7 @@ Sidrex Detox Form/
 
 ### 1. Repository'yi Klonlayın
 ```bash
-git clone https://github.com/yourusername/sidrex-detox-form.git
+git clone https://github.com/Alybefeygz/sidrex-detox-form.git
 cd sidrex-detox-form
 ```
 
