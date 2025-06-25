@@ -8,8 +8,6 @@ const API_CONFIG = {
 
 // API Base URL'sini ortama göre belirle
 function getApiBaseUrl() {
-    console.log('🔄 getApiBaseUrl fonksiyonu çağrıldı');
-    
     // Eğer sayfa localhost'ta çalışıyorsa development
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         const backendUrl = window.SIDREX_CONFIG?.DEVELOPMENT_BACKEND_URL || 'http://localhost:3000';
@@ -54,17 +52,13 @@ function getApiBaseUrl() {
 
 // DOM içeriği yüklendiğinde çalışacak ana fonksiyon
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Sayfa yüklendi, form başlatılıyor...');
     initializeForm();
     setupPDFModal();
     setupAydinlatmaPopup();
     setupRizaPopup();
-    console.log('✅ Form ve tüm bileşenler başarıyla başlatıldı');
 });
 
 function initializeForm() {
-    console.log('🔄 Form başlatma işlemi başladı');
-    
     // Tüm dinamik alan yöneticilerini başlat
     setupConditionalFields();
     setupCheckboxLimits();
@@ -76,17 +70,15 @@ function initializeForm() {
     if (form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault(); // Sayfa yenilenmesini engelle
-            console.log('📝 Form gönderme işlemi başlatıldı');
             submitForm();
         });
     }
     
-    console.log('✅ Form başarıyla başlatıldı');
+    console.log('Form başarıyla başlatıldı');
 }
 
 // Koşullu alanları yönetir
 function setupConditionalFields() {
-    console.log('🔄 Koşullu alanlar ayarlanıyor');
     
     // Kan testi sonuçları alanını yönet
     const bloodTestRadios = document.querySelectorAll('input[name="bloodTest"]');
@@ -95,16 +87,15 @@ function setupConditionalFields() {
     
     bloodTestRadios.forEach(radio => {
         radio.addEventListener('change', function() {
-            console.log(`🔄 Kan testi seçeneği değiştirildi: ${this.value}`);
             if (this.value === 'yes') {
+                // Eğer kullanıcı "Evet"i seçerse bu alanı göster
                 showElement(bloodTestResults);
                 bloodTestFile.setAttribute('required', 'required');
-                console.log('✅ Kan testi sonuç alanı gösterildi');
             } else {
+                // "Hayır" seçilirse alanı gizle
                 hideElement(bloodTestResults);
                 bloodTestFile.removeAttribute('required');
                 bloodTestFile.value = '';
-                console.log('✅ Kan testi sonuç alanı gizlendi');
             }
         });
     });
@@ -229,20 +220,16 @@ function setupConditionalFields() {
             document.getElementById('otherDietChallengeText').value = '';
         }
     });
-    
-    console.log('✅ Tüm koşullu alanlar başarıyla ayarlandı');
 }
 
 // Element gösterme fonksiyonu
 function showElement(element) {
-    console.log(`🔄 Element gösteriliyor: ${element.id || 'Isimsiz element'}`);
     element.style.display = 'block';
     element.classList.add('show');
 }
 
 // Element gizleme fonksiyonu
 function hideElement(element) {
-    console.log(`🔄 Element gizleniyor: ${element.id || 'Isimsiz element'}`);
     element.style.display = 'none';
     element.classList.remove('show');
 }
@@ -386,21 +373,18 @@ function setupFormValidation() {
 
 // Form doğrulama fonksiyonu
 function validateForm() {
-    console.log('🔄 Form doğrulama başladı');
     const requiredFields = document.querySelectorAll('[required]');
     let isValid = true;
     
     requiredFields.forEach(field => {
         if (!field.value.trim() && field.type !== 'radio' && field.type !== 'checkbox') {
             showFieldError(field, 'Bu alan zorunludur.');
-            console.log(`❌ Doğrulama hatası: ${field.id || field.name} alanı boş`);
             isValid = false;
         } else if (field.type === 'radio') {
             const radioGroup = document.querySelectorAll(`input[name="${field.name}"]`);
             const isChecked = Array.from(radioGroup).some(radio => radio.checked);
             if (!isChecked) {
                 showFieldError(field, 'Lütfen bir seçenek seçin.');
-                console.log(`❌ Doğrulama hatası: ${field.name} seçeneği seçilmemiş`);
                 isValid = false;
             }
         } else {
@@ -412,7 +396,6 @@ function validateForm() {
     // KVKK Onayları kontrolü - yeni validateKVKKApproval fonksiyonunu kullan
     const kvkkValid = validateKVKKApproval();
     if (!kvkkValid) {
-        console.log('❌ KVKK onayları eksik');
         isValid = false;
     }
     
@@ -420,13 +403,11 @@ function validateForm() {
     const ageField = document.getElementById('age');
     if (ageField.value && (ageField.value < 18 || ageField.value > 100)) {
         showFieldError(ageField, 'Yaş 18-100 arasında olmalıdır.');
-        console.log('❌ Yaş kontrolünde hata');
         isValid = false;
     } else if (ageField.value) {
         clearFieldError(ageField);
     }
     
-    console.log(`✅ Form doğrulama tamamlandı. Sonuç: ${isValid ? 'Geçerli' : 'Geçersiz'}`);
     return isValid;
 }
 
@@ -463,34 +444,40 @@ let isFormSubmitting = false;
 
 // Form gönderme fonksiyonu
 async function submitForm() {
-    console.log('🔄 Form gönderme işlemi başlatıldı');
-    
+    // Çift gönderim koruması
     if (isFormSubmitting) {
-        console.log('⚠️ Form zaten gönderiliyor, ikinci gönderim engellendi');
+        console.log('Form zaten gönderiliyor, ikinci gönderim engellendi');
         return;
     }
     
     const form = document.getElementById('applicationForm');
     const submitButton = form.querySelector('button[type="submit"]');
     
+    // Form validasyonunu kontrol et
     if (!validateForm()) {
-        console.log('❌ Form doğrulama başarısız, gönderim iptal edildi');
         return;
     }
     
+    // Gönderim durumunu aktif et
     isFormSubmitting = true;
-    console.log('🔄 Form verileri toplanıyor...');
+    
+    // Loading durumunu aktif et
+    form.classList.add('loading');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Gönderiliyor...';
+    }
     
     try {
+        // Form verilerini topla
         const formData = collectFormData(form);
-        console.log('📦 Toplanan form verileri:', formData);
         
         // Kan testi dosyası var mı kontrol et
         let bloodTestFileUrl = '';
         const bloodTestFile = document.getElementById('bloodTestFile');
         
         if (bloodTestFile && bloodTestFile.files.length > 0) {
-            console.log('📤 Kan testi dosyası yükleniyor...');
+            // Dosya yükleme işlemi
             const fileFormData = new FormData();
             fileFormData.append('files', bloodTestFile.files[0]);
             
@@ -504,12 +491,12 @@ async function submitForm() {
                 
                 if (fileResponse.ok && fileResult.success) {
                     bloodTestFileUrl = API_CONFIG.baseURL + fileResult.data.files[0].url;
-                    console.log('✅ Dosya başarıyla yüklendi:', bloodTestFileUrl);
+                    console.log('Dosya başarıyla yüklendi:', bloodTestFileUrl);
                 } else {
                     throw new Error(fileResult.message || 'Dosya yüklenirken hata oluştu');
                 }
             } catch (fileError) {
-                console.error('❌ Dosya yükleme hatası:', fileError);
+                console.error('Dosya yükleme hatası:', fileError);
                 throw new Error('Kan testi dosyası yüklenirken hata oluştu: ' + fileError.message);
             }
         }
@@ -518,10 +505,9 @@ async function submitForm() {
         formData.bloodTestFileUrl = bloodTestFileUrl;
         
         // Form verilerini konsola yazdır (geliştirme amaçlı)
-        console.log('📦 Form Verileri:', formData);
+        console.log('Form Verileri:', formData);
         
         // Backend'e POST isteği gönder
-        console.log('📤 Form verileri API\'ye gönderiliyor...');
         const response = await fetch(API_CONFIG.baseURL + API_CONFIG.endpoints.applications, {
             method: 'POST',
             headers: {
@@ -534,7 +520,7 @@ async function submitForm() {
         
         if (response.ok && result.success) {
             // Başarı durumunda
-            console.log('✅ Form başarıyla gönderildi');
+            console.log('Form başarıyla gönderildi:', result);
             
             // Başarı mesajı göster
             showSuccessMessage();
@@ -551,7 +537,7 @@ async function submitForm() {
         }
         
     } catch (error) {
-        console.error('❌ Form gönderme hatası:', error);
+        console.error('Form gönderim hatası:', error);
         
         // Detaylı hata mesajı
         let errorMessage = 'Form gönderilirken bir hata oluştu. Lütfen tekrar deneyin.';
@@ -579,262 +565,371 @@ async function submitForm() {
             submitButton.disabled = false;
             submitButton.textContent = 'Başvuru Gönder';
         }
-        console.log('🔄 Form gönderme işlemi tamamlandı');
     }
 }
 
-// Form verilerini topla
+// Form verilerini topla ve formatla
 function collectFormData(form) {
-    console.log('🔄 Form verileri toplanıyor');
-    const formData = {};
+    const formData = new FormData(form);
+    const data = {};
     
-    // Temel bilgiler
-    formData.name = form.querySelector('#name').value;
-    formData.email = form.querySelector('#email').value;
-    formData.phone = form.querySelector('#phone').value;
-    formData.age = form.querySelector('#age').value;
-    formData.gender = form.querySelector('input[name="gender"]:checked')?.value;
-    formData.height = form.querySelector('#height').value;
-    formData.weight = form.querySelector('#weight').value;
+    // Radio button grupları
+    const radioGroups = ['bloodTest', 'regularMedication', 'pastSurgery', 'bodyType', 'dietReadiness', 'mealsPerDay', 'snacking', 'waterIntake'];
     
-    console.log('📝 Temel bilgiler toplandı');
-    
-    // Sağlık durumu
-    formData.healthConditions = Array.from(form.querySelectorAll('input[name="healthConditions"]:checked')).map(cb => cb.value);
-    console.log('📝 Sağlık durumu bilgileri toplandı:', formData.healthConditions);
-    
-    // Vitamin eksikliği
-    formData.vitaminDeficiency = Array.from(form.querySelectorAll('input[name="vitaminDeficiency"]:checked')).map(cb => cb.value);
-    if (formData.vitaminDeficiency.includes('other')) {
-        formData.otherVitaminDeficiencyText = form.querySelector('#otherVitaminDeficiencyText').value;
-    }
-    console.log('📝 Vitamin eksikliği bilgileri toplandı:', formData.vitaminDeficiency);
-    
-    // Kronik hastalıklar
-    formData.chronicDiseases = Array.from(form.querySelectorAll('input[name="chronicDiseases"]:checked')).map(cb => cb.value);
-    if (formData.chronicDiseases.includes('other')) {
-        formData.otherChronicDiseaseText = form.querySelector('#otherChronicDiseaseText').value;
-    }
-    console.log('📝 Kronik hastalık bilgileri toplandı:', formData.chronicDiseases);
-    
-    // Alerjiler
-    formData.allergies = Array.from(form.querySelectorAll('input[name="allergies"]:checked')).map(cb => cb.value);
-    if (formData.allergies.includes('nuts')) {
-        formData.nutsDetailText = form.querySelector('#nutsDetailText').value;
-    }
-    if (formData.allergies.includes('other')) {
-        formData.otherAllergyText = form.querySelector('#otherAllergyText').value;
-    }
-    console.log('📝 Alerji bilgileri toplandı:', formData.allergies);
-    
-    // Sindirim sorunları
-    formData.digestiveIssues = Array.from(form.querySelectorAll('input[name="digestiveIssues"]:checked')).map(cb => cb.value);
-    console.log('📝 Sindirim sorunları bilgileri toplandı:', formData.digestiveIssues);
-    
-    // Diğer sağlık bilgileri
-    formData.bloodTest = form.querySelector('input[name="bloodTest"]:checked')?.value;
-    formData.regularMedication = form.querySelector('input[name="regularMedication"]:checked')?.value;
-    if (formData.regularMedication === 'yes') {
-        formData.medicationList = form.querySelector('#medicationList').value;
+    // Tüm form alanlarını işle
+    for (let [key, value] of formData.entries()) {
+        if (data[key]) {
+            // Birden fazla değer varsa array'e çevir (checkbox grupları için)
+            if (Array.isArray(data[key])) {
+                data[key].push(value);
+            } else {
+                data[key] = [data[key], value];
+            }
+        } else {
+            // Radio button ise label metnini al
+            if (radioGroups.includes(key)) {
+                const selectedRadio = document.querySelector(`input[name="${key}"]:checked`);
+                if (selectedRadio) {
+                    const label = document.querySelector(`label[for="${selectedRadio.id}"]`) || 
+                                  selectedRadio.closest('label') || 
+                                  selectedRadio.parentElement.querySelector('label');
+                    
+                    if (label) {
+                        data[key] = label.textContent.trim();
+                    } else {
+                        data[key] = value;
+                    }
+                } else {
+                    data[key] = value;
+                }
+            } else {
+                data[key] = value;
+            }
+        }
     }
     
-    formData.pastSurgery = form.querySelector('input[name="pastSurgery"]:checked')?.value;
-    if (formData.pastSurgery === 'yes') {
-        formData.surgeryList = form.querySelector('#surgeryList').value;
+    // Checkbox gruplarını array olarak ayarla
+    const checkboxGroups = ['healthConditions', 'vitaminDeficiency', 'chronicDiseases', 'allergies', 'digestiveIssues', 'dietChallenges'];
+    checkboxGroups.forEach(group => {
+        const elements = document.querySelectorAll(`input[name="${group}"]:checked`);
+        data[group] = Array.from(elements).map(el => {
+            // Checkbox'ın label elementini bul ve metnini al
+            const label = document.querySelector(`label[for="${el.id}"]`) || 
+                          el.closest('label') || 
+                          el.parentElement.querySelector('label');
+            
+            if (label) {
+                // Label'in text content'ini al, sadece checkbox'ın yanındaki metni
+                const labelText = label.textContent.trim();
+                return labelText;
+            }
+            
+            // Eğer label bulunamazsa value'yu döndür
+            return el.value;
+        });
+    });
+    
+    // Input detaylarını ana alanlarla birleştir
+    // İlaç detayları
+    if (data.regularMedication === 'Evet' && data.medicationList) {
+        data.regularMedication = `Evet; ${data.medicationList.trim()}`;
+        delete data.medicationList; // Artık ayrı alana gerek yok
     }
-    console.log('📝 Diğer sağlık bilgileri toplandı');
     
-    // Yaşam tarzı bilgileri
-    formData.bodyType = form.querySelector('input[name="bodyType"]:checked')?.value;
-    if (formData.bodyType === 'other') {
-        formData.otherBodyTypeText = form.querySelector('#otherBodyTypeText').value;
+    // Ameliyat detayları
+    if (data.pastSurgery === 'Evet' && data.surgeryList) {
+        data.pastSurgery = `Evet; ${data.surgeryList.trim()}`;
+        delete data.surgeryList; // Artık ayrı alana gerek yok
     }
     
-    formData.dietChallenges = Array.from(form.querySelectorAll('input[name="dietChallenges"]:checked')).map(cb => cb.value);
-    if (formData.dietChallenges.includes('other')) {
-        formData.otherDietChallengeText = form.querySelector('#otherDietChallengeText').value;
+    // Vitamin eksikliği "Diğer" detayları
+    if (data.vitaminDeficiency && data.vitaminDeficiency.includes('Diğer') && data.otherVitaminDeficiencyText) {
+        const index = data.vitaminDeficiency.indexOf('Diğer');
+        data.vitaminDeficiency[index] = `Diğer; ${data.otherVitaminDeficiencyText.trim()}`;
+        delete data.otherVitaminDeficiencyText;
     }
-    console.log('📝 Yaşam tarzı bilgileri toplandı');
     
-    // KVKK onayları
-    formData.kvkkApproval = {
-        aydinlatmaMetni: form.querySelector('#aydinlatmaMetni').checked,
-        acikRizaMetni: form.querySelector('#acikRizaMetni').checked
-    };
-    console.log('📝 KVKK onayları toplandı');
+    // Kronik hastalık "Diğer" detayları
+    if (data.chronicDiseases && data.chronicDiseases.includes('Diğer') && data.otherChronicDiseaseText) {
+        const index = data.chronicDiseases.indexOf('Diğer');
+        data.chronicDiseases[index] = `Diğer; ${data.otherChronicDiseaseText.trim()}`;
+        delete data.otherChronicDiseaseText;
+    }
     
-    console.log('✅ Tüm form verileri başarıyla toplandı');
-    return formData;
+    // Alerji "Diğer" detayları
+    if (data.allergies && data.allergies.includes('Diğer') && data.otherAllergyText) {
+        const index = data.allergies.indexOf('Diğer');
+        data.allergies[index] = `Diğer; ${data.otherAllergyText.trim()}`;
+        delete data.otherAllergyText;
+    }
+    
+    // Vücut tipi "Diğer" detayları
+    if (data.bodyType === 'Diğer' && data.otherBodyTypeText) {
+        data.bodyType = `Diğer; ${data.otherBodyTypeText.trim()}`;
+        delete data.otherBodyTypeText;
+    }
+    
+    // Diyet zorluğu "Diğer" detayları
+    if (data.dietChallenges && data.dietChallenges.includes('Diğer') && data.otherDietChallengeText) {
+        const index = data.dietChallenges.indexOf('Diğer');
+        data.dietChallenges[index] = `Diğer; ${data.otherDietChallengeText.trim()}`;
+        delete data.otherDietChallengeText;
+    }
+    
+    // KVKK Onaylarını ekle
+    const aydinlatmaMetni = document.getElementById('aydinlatmaMetni');
+    const acikRizaMetni = document.getElementById('acikRizaMetni');
+    
+    data.aydinlatmaMetni = aydinlatmaMetni.checked ? 'Onaylandı' : 'Onaylanmadı';
+    data.acikRizaMetni = acikRizaMetni.checked ? 'Onaylandı' : 'Onaylanmadı';
+    
+    // Sayısal alanları number tipine çevir
+    const numberFields = ['age', 'height', 'weight'];
+    numberFields.forEach(field => {
+        if (data[field]) {
+            data[field] = parseInt(data[field], 10);
+        }
+    });
+    
+    // Boş string'leri null yap
+    Object.keys(data).forEach(key => {
+        if (typeof data[key] === 'string' && data[key].trim() === '') {
+            data[key] = null;
+        }
+    });
+    
+    return data;
 }
 
 // Hata mesajı göster
 function showErrorMessage(message) {
-    console.log('❌ Hata mesajı gösteriliyor:', message);
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-popup';
-    errorDiv.innerHTML = `
-        <div class="error-content">
-            <h3>Hata</h3>
-            <p>${message}</p>
-            <button onclick="this.parentElement.parentElement.remove()">Tamam</button>
-        </div>
-    `;
-    document.body.appendChild(errorDiv);
+    // Mevcut hata mesajını kaldır
+    const existingError = document.querySelector('.form-error-message');
+    if (existingError) {
+        existingError.remove();
+    }
     
-    // 5 saniye sonra otomatik kapat
-    setTimeout(() => {
-        if (errorDiv.parentNode) {
-            errorDiv.remove();
-            console.log('✅ Hata mesajı otomatik kapatıldı');
+    // Yeni hata mesajı oluştur
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'form-error-message';
+    errorDiv.style.cssText = `
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        padding: 12px;
+        margin: 20px 0;
+        text-align: center;
+        font-weight: 500;
+    `;
+    errorDiv.textContent = message;
+    
+    // Güvenli ekleme stratejisi
+    try {
+        const form = document.getElementById('applicationForm');
+        if (form && form.parentNode) {
+            form.parentNode.insertBefore(errorDiv, form);
+        } else {
+            // Eğer form bulunamazsa farklı container'ları dene
+            const container = document.querySelector('.container') || 
+                            document.querySelector('main') || 
+                            document.querySelector('body') || 
+                            document.body;
+            
+            if (container && container.firstChild) {
+                container.insertBefore(errorDiv, container.firstChild);
+            } else if (container) {
+                container.appendChild(errorDiv);
+            } else {
+                document.body.appendChild(errorDiv);
+            }
         }
-    }, 5000);
+    } catch (error) {
+        console.error('Hata mesajı eklenemedi:', error);
+        // Son çare olarak body'ye ekle
+        document.body.appendChild(errorDiv);
+    }
+    
+    // Sayfa en üste kaydır
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // 10 saniye sonra mesajı kaldır
+    setTimeout(() => {
+        try {
+            if (errorDiv && errorDiv.parentNode) {
+                errorDiv.remove();
+            }
+        } catch (error) {
+            console.log('Hata mesajı kaldırılamadı:', error);
+        }
+    }, 10000);
 }
 
 // Başarı mesajı göster
 function showSuccessMessage() {
-    console.log('🎉 Başarı mesajı gösteriliyor');
-    const successDiv = document.createElement('div');
-    successDiv.className = 'success-popup';
-    successDiv.innerHTML = `
-        <div class="success-content">
-            <h3>Başarılı!</h3>
-            <p>Başvurunuz başarıyla alındı. En kısa sürede sizinle iletişime geçeceğiz.</p>
-            <button onclick="this.parentElement.parentElement.remove()">Tamam</button>
+    // Form container'ını bul
+    const container = document.querySelector('.container');
+    const form = document.getElementById('applicationForm');
+    
+    // Ad-soyad değerini al
+    const fullName = document.getElementById('fullName').value;
+    
+    // Form container'ının içeriğini tamamen temizle
+    container.innerHTML = '';
+    
+    // Yeni başarı mesajı içeriğini oluştur
+    const successHTML = `
+        <div class="simple-success-container">
+            <p>Merhaba ${fullName}</p>
+            <p>Başvurunuz başarıyla alınmıştır. En kısa sürede sizinle iletişime geçeceğiz.</p>
         </div>
     `;
-    document.body.appendChild(successDiv);
     
-    // 5 saniye sonra otomatik kapat
-    setTimeout(() => {
-        if (successDiv.parentNode) {
-            successDiv.remove();
-            console.log('✅ Başarı mesajı otomatik kapatıldı');
-        }
-    }, 5000);
+    // Yeni içeriği container'a ekle
+    container.innerHTML = successHTML;
+    
+    // Sayfa en üste kaydır
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Form verilerini local storage'a kaydet
+// Form verilerini localStorage'a kaydet
 function saveFormData(dataObject) {
-    console.log('🔄 Form verileri local storage\'a kaydediliyor');
     try {
-        localStorage.setItem('formData', JSON.stringify(dataObject));
-        console.log('✅ Form verileri başarıyla kaydedildi');
+        // dataObject'in tipini kontrol et
+        let finalData = {};
+        
+        // Eğer FormData ise objeye çevir
+        if (dataObject instanceof FormData) {
+            for (let [key, value] of dataObject.entries()) {
+                if (finalData[key]) {
+                    // Birden fazla değer varsa array'e çevir
+                    if (Array.isArray(finalData[key])) {
+                        finalData[key].push(value);
+                    } else {
+                        finalData[key] = [finalData[key], value];
+                    }
+                } else {
+                    finalData[key] = value;
+                }
+            }
+        } else if (typeof dataObject === 'object' && dataObject !== null) {
+            // Zaten bir obje ise direkt kullan
+            finalData = { ...dataObject };
+        } else {
+            console.error('saveFormData: Geçersiz veri tipi', typeof dataObject);
+            return;
+        }
+        
+        finalData.submissionDate = new Date().toISOString();
+        
+        localStorage.setItem('applicationFormData', JSON.stringify(finalData));
+        console.log('Form verileri başarıyla kaydedildi.');
     } catch (error) {
-        console.error('❌ Form verileri kaydedilirken hata oluştu:', error);
+        console.error('Form verileri kaydedilemedi:', error);
     }
 }
 
 // Formu sıfırla
 function resetForm() {
-    console.log('🔄 Form sıfırlama işlemi başlatıldı');
     const form = document.getElementById('applicationForm');
-    
-    // Tüm input alanlarını temizle
     form.reset();
     
-    // Koşullu alanları gizle
+    // Tüm koşullu alanları gizle
     const conditionalFields = document.querySelectorAll('.conditional-field');
-    conditionalFields.forEach(field => {
-        hideElement(field);
+    conditionalFields.forEach(field => hideElement(field));
+    
+    // Tüm required attribute'larını kaldır
+    const conditionalInputs = document.querySelectorAll('.conditional-field input, .conditional-field textarea');
+    conditionalInputs.forEach(input => input.removeAttribute('required'));
+    
+    // Hata mesajlarını temizle
+    const errorMessages = document.querySelectorAll('.error-message');
+    errorMessages.forEach(error => error.remove());
+    
+    console.log('Form başarıyla sıfırlandı.');
+}
+
+// Form ilerleme çubuğunu kur
+function setupFormProgress() {
+    // Progress bar HTML'i oluştur
+    const progressHTML = `
+        <div class="form-progress">
+            <div class="form-progress-bar"></div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('afterbegin', progressHTML);
+    
+    const progressBar = document.querySelector('.form-progress-bar');
+    const form = document.getElementById('applicationForm');
+    
+    // Form scroll olayını dinle
+    window.addEventListener('scroll', function() {
+        updateProgress();
     });
     
-    // Local storage'ı temizle
-    localStorage.removeItem('formData');
-    
-    // İlerleme çubuğunu sıfırla
-    updateProgress();
-    
-    console.log('✅ Form başarıyla sıfırlandı');
-}
-
-// Form ilerleme durumunu ayarla
-function setupFormProgress() {
-    console.log('🔄 Form ilerleme durumu ayarlanıyor');
-    
-    const form = document.getElementById('applicationForm');
-    const progressBar = document.querySelector('.progress-bar');
-    const progressText = document.querySelector('.progress-text');
-    
-    if (!form || !progressBar || !progressText) {
-        console.log('⚠️ İlerleme çubuğu elementleri bulunamadı');
-        return;
-    }
-    
-    // Form alanları değiştiğinde ilerlemeyi güncelle
-    form.addEventListener('change', updateProgress);
-    form.addEventListener('input', updateProgress);
-    
-    // İlk ilerleme durumunu hesapla
-    updateProgress();
-    console.log('✅ Form ilerleme durumu ayarlandı');
+    // Form değişikliklerini dinle
+    form.addEventListener('input', function() {
+        updateProgress();
+    });
     
     function updateProgress() {
-        console.log('🔄 İlerleme durumu güncelleniyor');
-        const requiredFields = form.querySelectorAll('[required]');
-        let completedFields = 0;
+        const formHeight = form.offsetHeight;
+        const windowHeight = window.innerHeight;
+        const scrollTop = window.pageYOffset;
+        const formTop = form.offsetTop;
         
-        requiredFields.forEach(field => {
-            if (field.type === 'radio') {
-                // Radio buttonlar için grup kontrolü
-                const radioGroup = form.querySelectorAll(`input[name="${field.name}"]`);
-                if (Array.from(radioGroup).some(radio => radio.checked)) {
-                    completedFields++;
-                }
-            } else if (field.type === 'checkbox') {
-                if (field.checked) completedFields++;
-            } else {
-                if (field.value.trim()) completedFields++;
-            }
-        });
-        
-        const progress = Math.round((completedFields / requiredFields.length) * 100);
-        progressBar.style.width = `${progress}%`;
-        progressText.textContent = `${progress}%`;
-        
-        console.log(`📊 Form ilerleme durumu: ${progress}%`);
+        // Form görünür alanındaysa ilerlemeyi hesapla
+        if (scrollTop + windowHeight > formTop && scrollTop < formTop + formHeight) {
+            const scrollProgress = Math.max(0, Math.min(100, 
+                ((scrollTop + windowHeight - formTop) / formHeight) * 100
+            ));
+            
+            progressBar.style.width = scrollProgress + '%';
+        }
     }
 }
 
-// Kaydedilmiş form verilerini yükle
+// Sayfa yüklendiğinde form verilerini geri yükle (isteğe bağlı)
 function loadSavedFormData() {
-    console.log('🔄 Kaydedilmiş form verileri yükleniyor');
     try {
-        const savedData = localStorage.getItem('formData');
-        if (!savedData) {
-            console.log('ℹ️ Kaydedilmiş form verisi bulunamadı');
-            return;
+        const savedData = localStorage.getItem('applicationFormData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            
+            // Kullanıcıya veri geri yükleme seçeneği sun
+            if (confirm('Daha önce kaydedilmiş form verileriniz bulundu. Geri yüklemek ister misiniz?')) {
+                // Form verilerini geri yükle
+                Object.keys(data).forEach(key => {
+                    if (key !== 'submissionDate') {
+                        const field = document.querySelector(`[name="${key}"]`);
+                        if (field) {
+                            if (field.type === 'checkbox' || field.type === 'radio') {
+                                if (Array.isArray(data[key])) {
+                                    data[key].forEach(value => {
+                                        const specificField = document.querySelector(`[name="${key}"][value="${value}"]`);
+                                        if (specificField) specificField.checked = true;
+                                    });
+                                } else {
+                                    const specificField = document.querySelector(`[name="${key}"][value="${data[key]}"]`);
+                                    if (specificField) specificField.checked = true;
+                                }
+                            } else {
+                                field.value = data[key];
+                            }
+                        }
+                    }
+                });
+                
+                // Koşullu alanları güncelle
+                setTimeout(() => {
+                    document.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]:checked')
+                        .forEach(input => input.dispatchEvent(new Event('change')));
+                }, 100);
+            }
         }
-        
-        const formData = JSON.parse(savedData);
-        const form = document.getElementById('applicationForm');
-        
-        // Temel bilgileri doldur
-        form.querySelector('#name').value = formData.name || '';
-        form.querySelector('#email').value = formData.email || '';
-        form.querySelector('#phone').value = formData.phone || '';
-        form.querySelector('#age').value = formData.age || '';
-        
-        // Radio butonları doldur
-        if (formData.gender) {
-            const genderRadio = form.querySelector(`input[name="gender"][value="${formData.gender}"]`);
-            if (genderRadio) genderRadio.checked = true;
-        }
-        
-        // Checkbox gruplarını doldur
-        if (formData.healthConditions) {
-            formData.healthConditions.forEach(value => {
-                const checkbox = form.querySelector(`input[name="healthConditions"][value="${value}"]`);
-                if (checkbox) checkbox.checked = true;
-            });
-        }
-        
-        console.log('✅ Kaydedilmiş form verileri başarıyla yüklendi');
-        
-        // İlerleme çubuğunu güncelle
-        updateProgress();
-        
     } catch (error) {
-        console.error('❌ Form verileri yüklenirken hata oluştu:', error);
+        console.error('Kaydedilmiş veriler yüklenemedi:', error);
     }
 }
 
@@ -889,253 +984,284 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// PDF modal ayarlarını yap
+// PDF Container fonksiyonları
 function setupPDFModal() {
-    console.log('🔄 PDF modal ayarları yapılıyor');
-    // Modal kapatma olaylarını dinle
-    document.addEventListener('keydown', handleEscapeKey);
-    document.addEventListener('click', handleOutsideClick);
-    console.log('✅ PDF modal ayarları tamamlandı');
+    // Bu fonksiyon artık gerekli değil ama mevcut çağrıları bozmamak için bırakıyoruz
+    console.log('PDF sistem hazır - yeni sekmede açılacak');
 }
 
-// PDF'i yeni sekmede aç
+// PDF indirme fonksiyonu
 function openPDFNewTab(type) {
-    console.log(`🔄 PDF açılıyor: ${type}`);
-    let pdfUrl;
+    let pdfPath = '';
+    let titleText = '';
+    let fileName = '';
     
-    if (type === 'aydinlatma') {
-        pdfUrl = 'documents/sidrex-açık-riza-metni.pdf';
-    } else if (type === 'riza') {
-        pdfUrl = 'documents/sidrex-aydinlatma-metni.pdf';
+    switch(type) {
+        case 'aydinlatma':
+            pdfPath = './documents/SİDREX DETOX KAMPI AYDINLATMA METNİ_REV2.pdf';
+            titleText = 'Sidrex Detox Kampı Aydınlatma Metni';
+            fileName = 'Sidrex_Aydinlatma_Metni.pdf';
+            break;
+        case 'riza':
+            pdfPath = './documents/SİRDREX DETOX KULLANICI AÇIK RIZA METNİ_REV.pdf';
+            titleText = 'Sidrex Detox Kullanıcı Açık Rıza Metni';
+            fileName = 'Sidrex_Acik_Riza_Metni.pdf';
+            break;
+        default:
+            console.error('Geçersiz PDF türü:', type);
+            return;
     }
     
-    if (pdfUrl) {
-        window.open(pdfUrl, '_blank');
-        console.log(`✅ PDF yeni sekmede açıldı: ${pdfUrl}`);
-    } else {
-        console.error('❌ PDF türü geçersiz');
-    }
+    // PDF'i indirme linkini oluştur
+    const link = document.createElement('a');
+    link.href = pdfPath;
+    link.download = fileName;
+    link.target = '_blank';
+    
+    // Link'i DOM'a ekle, tıkla ve kaldır
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Kullanıcıya bilgi ver
+    showPDFInfo(titleText, 'download');
+    
+    console.log('PDF indirme başlatıldı:', titleText);
 }
 
-// PDF bilgi mesajını göster
+// PDF açıldığında bilgi mesajı göster
 function showPDFInfo(titleText) {
-    console.log('🔄 PDF bilgi mesajı gösteriliyor');
-    const infoDiv = document.createElement('div');
-    infoDiv.className = 'pdf-info-popup';
-    infoDiv.innerHTML = `
+    // Mevcut bilgi mesajını kaldır
+    const existingInfo = document.querySelector('.pdf-info-message');
+    if (existingInfo) {
+        existingInfo.remove();
+    }
+    
+    // Yeni bilgi mesajı oluştur
+    const infoMessage = document.createElement('div');
+    infoMessage.className = 'pdf-info-message';
+    infoMessage.innerHTML = `
         <div class="pdf-info-content">
-            <h3>${titleText}</h3>
-            <p>PDF dosyası yeni sekmede açılacaktır.</p>
-            <button onclick="this.parentElement.parentElement.remove()">Tamam</button>
+            ✅ <strong>${titleText}</strong> yeni sekmede açıldı.
+            <br>
+            <small>Dokümanı okuduktan sonra bu sekmeye geri dönüp onayları işaretleyebilirsiniz.</small>
         </div>
     `;
-    document.body.appendChild(infoDiv);
     
-    // 3 saniye sonra otomatik kapat
-    setTimeout(() => {
-        if (infoDiv.parentNode) {
-            infoDiv.remove();
-            console.log('✅ PDF bilgi mesajı otomatik kapatıldı');
-        }
-    }, 3000);
+    // Documents section'a ekle
+    const documentsSection = document.querySelector('.documents-section');
+    if (documentsSection) {
+        documentsSection.appendChild(infoMessage);
+        
+        // 5 saniye sonra mesajı otomatik kaldır
+        setTimeout(() => {
+            if (infoMessage && infoMessage.parentNode) {
+                infoMessage.remove();
+            }
+        }, 5000);
+    }
 }
 
-// PDF'i inline olarak aç
+// Eski inline fonksiyonları - geriye dönük uyumluluk için
 function openPDFInline(type) {
-    console.log(`🔄 PDF inline olarak açılıyor: ${type}`);
-    const modal = document.getElementById('pdfModal');
-    const pdfViewer = document.getElementById('pdfViewer');
-    
-    let pdfUrl;
-    if (type === 'aydinlatma') {
-        pdfUrl = 'documents/sidrex-açık-riza-metni.pdf';
-    } else if (type === 'riza') {
-        pdfUrl = 'documents/sidrex-aydinlatma-metni.pdf';
-    }
-    
-    if (pdfUrl && modal && pdfViewer) {
-        pdfViewer.src = pdfUrl;
-        modal.style.display = 'block';
-        console.log(`✅ PDF inline olarak açıldı: ${pdfUrl}`);
-    } else {
-        console.error('❌ PDF açılırken hata oluştu');
-    }
+    // Yeni sekmede açmaya yönlendir
+    openPDFNewTab(type);
 }
 
-// PDF modalını kapat
 function closePDFInline() {
-    console.log('🔄 PDF modalı kapatılıyor');
-    const modal = document.getElementById('pdfModal');
-    if (modal) {
-        modal.style.display = 'none';
-        console.log('✅ PDF modalı kapatıldı');
-    }
+    // Artık kullanılmıyor
+    console.log('Inline PDF kapatma - artık kullanılmıyor');
 }
 
-// KVKK onaylarını doğrula
+// KVKK validasyon fonksiyonlarını güncelle
 function validateKVKKApproval() {
-    console.log('🔄 KVKK onayları kontrol ediliyor');
     const aydinlatmaMetni = document.getElementById('aydinlatmaMetni');
     const acikRizaMetni = document.getElementById('acikRizaMetni');
-    
     let isValid = true;
     
     if (!aydinlatmaMetni.checked) {
-        showFieldError(aydinlatmaMetni, 'Aydınlatma metnini onaylamanız gerekmektedir.');
-        console.log('❌ Aydınlatma metni onaylanmamış');
+        showFieldError(aydinlatmaMetni, 'Katılımcı Aydınlatma Metnini okumanız ve onaylamanız zorunludur.');
         isValid = false;
+    } else {
+        clearFieldError(aydinlatmaMetni);
     }
     
     if (!acikRizaMetni.checked) {
-        showFieldError(acikRizaMetni, 'Açık rıza metnini onaylamanız gerekmektedir.');
-        console.log('❌ Açık rıza metni onaylanmamış');
+        showFieldError(acikRizaMetni, 'Katılımcı Açık Rıza Metnini okumanız ve onaylamanız zorunludur.');
         isValid = false;
+    } else {
+        clearFieldError(acikRizaMetni);
     }
     
-    console.log(`✅ KVKK onay kontrolü tamamlandı. Sonuç: ${isValid ? 'Geçerli' : 'Geçersiz'}`);
     return isValid;
 }
 
-// Alan hata mesajını temizle
+// Hata mesajını temizleme fonksiyonu
 function clearFieldError(field) {
-    console.log(`🔄 Alan hatası temizleniyor: ${field.id || field.name}`);
-    const errorMessage = field.parentNode.querySelector('.error-message');
-    if (errorMessage) {
-        errorMessage.remove();
+    // Hata mesajını kaldır
+    const existingError = field.parentNode.querySelector('.field-error');
+    if (existingError) {
+        existingError.remove();
     }
-    field.style.borderColor = '';
-    console.log('✅ Alan hatası temizlendi');
-}
-
-// Aydınlatma metni popup ayarlarını yap
-function setupAydinlatmaPopup() {
-    console.log('🔄 Aydınlatma metni popup ayarları yapılıyor');
-    const openButton = document.querySelector('.open-aydinlatma-btn');
-    const closeButton = document.querySelector('.close-aydinlatma-btn');
-    const popup = document.querySelector('.aydinlatma-popup');
     
-    if (openButton && closeButton && popup) {
-        openButton.addEventListener('click', openAydinlatmaPopup);
-        closeButton.addEventListener('click', closeAydinlatmaPopup);
-        console.log('✅ Aydınlatma metni popup ayarları tamamlandı');
-    } else {
-        console.error('❌ Aydınlatma metni popup elementleri bulunamadı');
+    // Hata stillerini kaldır
+    field.classList.remove('error');
+    if (field.type === 'checkbox' || field.type === 'radio') {
+        const labels = field.closest('.checkbox-group, .radio-group')?.querySelectorAll('label');
+        labels?.forEach(label => label.classList.remove('error'));
     }
 }
 
-// Aydınlatma metni popupını aç
+// Aydınlatma Metni Popup Fonksiyonları
+function setupAydinlatmaPopup() {
+    const aydinlatmaCheckbox = document.getElementById('aydinlatmaMetni');
+    
+    if (aydinlatmaCheckbox) {
+        aydinlatmaCheckbox.addEventListener('click', function(e) {
+            // Checkbox'ın işaretlenmesini engelle
+            e.preventDefault();
+            
+            // Popup'ı aç
+            openAydinlatmaPopup();
+        });
+    }
+}
+
 function openAydinlatmaPopup() {
-    console.log('🔄 Aydınlatma metni popup açılıyor');
-    const popup = document.querySelector('.aydinlatma-popup');
+    const popup = document.getElementById('aydinlatmaMetniPopup');
     if (popup) {
-        popup.style.display = 'block';
+        popup.style.display = 'flex';
+        
+        // Body scroll'unu engelle
+        document.body.style.overflow = 'hidden';
+        
+        // ESC tuşu ile kapatma
         document.addEventListener('keydown', handleEscapeKey);
-        document.addEventListener('click', handleOutsideClick);
-        console.log('✅ Aydınlatma metni popup açıldı');
-    } else {
-        console.error('❌ Aydınlatma metni popup elementi bulunamadı');
+        
+        // Popup dışına tıklama ile kapatma
+        popup.addEventListener('click', handleOutsideClick);
+        
+        console.log('Aydınlatma metni popup açıldı');
     }
 }
 
-// Aydınlatma metni popupını kapat
 function closeAydinlatmaPopup() {
-    console.log('🔄 Aydınlatma metni popup kapatılıyor');
-    const popup = document.querySelector('.aydinlatma-popup');
+    const popup = document.getElementById('aydinlatmaMetniPopup');
+    const checkbox = document.getElementById('aydinlatmaMetni');
+    
     if (popup) {
         popup.style.display = 'none';
+        
+        // Body scroll'unu geri aç
+        document.body.style.overflow = '';
+        
+        // Event listener'ları kaldır
         document.removeEventListener('keydown', handleEscapeKey);
-        document.removeEventListener('click', handleOutsideClick);
-        console.log('✅ Aydınlatma metni popup kapatıldı');
-    } else {
-        console.error('❌ Aydınlatma metni popup elementi bulunamadı');
+        popup.removeEventListener('click', handleOutsideClick);
+        
+        // Checkbox'ı işaretle
+        if (checkbox) {
+            checkbox.checked = true;
+            
+            // Checkbox'a tıklama eventini geçici olarak kaldır
+            const newCheckbox = checkbox.cloneNode(true);
+            checkbox.parentNode.replaceChild(newCheckbox, checkbox);
+            
+            // Yeni checkbox'a normal davranış ekle
+            setTimeout(() => {
+                setupAydinlatmaPopup();
+            }, 100);
+        }
+        
+        console.log('Aydınlatma metni popup kapatıldı ve onay verildi');
     }
 }
 
-// ESC tuşu ile kapatma
 function handleEscapeKey(e) {
     if (e.key === 'Escape') {
-        console.log('🔄 ESC tuşu ile popup kapatılıyor');
         closeAydinlatmaPopup();
-        closeRizaPopup();
-        closePDFInline();
     }
 }
 
-// Dışarı tıklama ile kapatma
 function handleOutsideClick(e) {
-    console.log('🔄 Dışarı tıklama kontrolü yapılıyor');
-    const aydinlatmaPopup = document.querySelector('.aydinlatma-popup .popup-content');
-    const rizaPopup = document.querySelector('.riza-popup .popup-content');
-    const pdfModal = document.querySelector('#pdfModal .modal-content');
-    
-    if (aydinlatmaPopup && !aydinlatmaPopup.contains(e.target)) {
+    if (e.target === e.currentTarget) {
         closeAydinlatmaPopup();
     }
-    if (rizaPopup && !rizaPopup.contains(e.target)) {
-        closeRizaPopup();
-    }
-    if (pdfModal && !pdfModal.contains(e.target)) {
-        closePDFInline();
-    }
 }
 
-// Açık rıza metni popup ayarlarını yap
+// Rıza Metni Popup Fonksiyonları
 function setupRizaPopup() {
-    console.log('🔄 Açık rıza metni popup ayarları yapılıyor');
-    const openButton = document.querySelector('.open-riza-btn');
-    const closeButton = document.querySelector('.close-riza-btn');
-    const popup = document.querySelector('.riza-popup');
+    const rizaCheckbox = document.getElementById('acikRizaMetni');
     
-    if (openButton && closeButton && popup) {
-        openButton.addEventListener('click', openRizaPopup);
-        closeButton.addEventListener('click', closeRizaPopup);
-        console.log('✅ Açık rıza metni popup ayarları tamamlandı');
-    } else {
-        console.error('❌ Açık rıza metni popup elementleri bulunamadı');
+    if (rizaCheckbox) {
+        rizaCheckbox.addEventListener('click', function(e) {
+            // Checkbox'ın işaretlenmesini engelle
+            e.preventDefault();
+            
+            // Popup'ı aç
+            openRizaPopup();
+        });
     }
 }
 
-// Açık rıza metni popupını aç
 function openRizaPopup() {
-    console.log('🔄 Açık rıza metni popup açılıyor');
-    const popup = document.querySelector('.riza-popup');
+    const popup = document.getElementById('rizaMetniPopup');
     if (popup) {
-        popup.style.display = 'block';
+        popup.style.display = 'flex';
+        
+        // Body scroll'unu engelle
+        document.body.style.overflow = 'hidden';
+        
+        // ESC tuşu ile kapatma
         document.addEventListener('keydown', handleRizaEscapeKey);
-        document.addEventListener('click', handleRizaOutsideClick);
-        console.log('✅ Açık rıza metni popup açıldı');
-    } else {
-        console.error('❌ Açık rıza metni popup elementi bulunamadı');
+        
+        // Popup dışına tıklama ile kapatma
+        popup.addEventListener('click', handleRizaOutsideClick);
+        
+        console.log('Rıza metni popup açıldı');
     }
 }
 
-// Açık rıza metni popupını kapat
 function closeRizaPopup() {
-    console.log('🔄 Açık rıza metni popup kapatılıyor');
-    const popup = document.querySelector('.riza-popup');
+    const popup = document.getElementById('rizaMetniPopup');
+    const checkbox = document.getElementById('acikRizaMetni');
+    
     if (popup) {
         popup.style.display = 'none';
+        
+        // Body scroll'unu geri aç
+        document.body.style.overflow = '';
+        
+        // Event listener'ları kaldır
         document.removeEventListener('keydown', handleRizaEscapeKey);
-        document.removeEventListener('click', handleRizaOutsideClick);
-        console.log('✅ Açık rıza metni popup kapatıldı');
-    } else {
-        console.error('❌ Açık rıza metni popup elementi bulunamadı');
+        popup.removeEventListener('click', handleRizaOutsideClick);
+        
+        // Checkbox'ı işaretle
+        if (checkbox) {
+            checkbox.checked = true;
+            
+            // Checkbox'a tıklama eventini geçici olarak kaldır
+            const newCheckbox = checkbox.cloneNode(true);
+            checkbox.parentNode.replaceChild(newCheckbox, checkbox);
+            
+            // Yeni checkbox'a normal davranış ekle
+            setTimeout(() => {
+                setupRizaPopup();
+            }, 100);
+        }
+        
+        console.log('Rıza metni popup kapatıldı ve onay verildi');
     }
 }
 
-// Rıza popup ESC tuşu ile kapatma
 function handleRizaEscapeKey(e) {
     if (e.key === 'Escape') {
-        console.log('🔄 ESC tuşu ile rıza popup kapatılıyor');
         closeRizaPopup();
     }
 }
 
-// Rıza popup dışarı tıklama ile kapatma
 function handleRizaOutsideClick(e) {
-    console.log('🔄 Rıza popup dışarı tıklama kontrolü yapılıyor');
-    const popupContent = document.querySelector('.riza-popup .popup-content');
-    if (popupContent && !popupContent.contains(e.target)) {
+    if (e.target === e.currentTarget) {
         closeRizaPopup();
     }
 }
