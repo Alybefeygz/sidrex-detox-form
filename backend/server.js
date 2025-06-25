@@ -57,11 +57,13 @@ const corsOptions = {
         const localDomains = [
             'http://localhost:3000',
             'http://127.0.0.1:3000',
-            'http://localhost:5500', // Live Server default
+            'http://localhost:3001',
+            'http://127.0.0.1:3001',
+            'http://localhost:5500',
             'http://127.0.0.1:5500',
-            'http://localhost:8080', // Python HTTP server
+            'http://localhost:8080',
             'http://127.0.0.1:8080',
-            'http://localhost:8081', // Python HTTP server (kullanıcının tercihi)
+            'http://localhost:8081',
             'http://127.0.0.1:8081'
         ];
 
@@ -84,7 +86,7 @@ const corsOptions = {
         }
 
         // Origin kontrolü
-        if (allowedOrigins.indexOf(origin) !== -1) {
+        if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
             callback(null, true);
         } else {
             console.log(`CORS: Blocked origin: ${origin}`);

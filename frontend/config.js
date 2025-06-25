@@ -18,7 +18,7 @@ window.SIDREX_CONFIG = {
     DEVELOPMENT_BACKEND_URL: 'http://localhost:3000',
     
     // Frontend development ports (değiştirmeyin)
-    DEVELOPMENT_FRONTEND_PORTS: [8080, 8081],
+    DEVELOPMENT_FRONTEND_PORTS: [3001],
     
     // API endpoints (değiştirmeyin)
     ENDPOINTS: {

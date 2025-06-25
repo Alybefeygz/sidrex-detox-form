@@ -484,12 +484,24 @@ async function submitForm() {
             try {
                 const fileResponse = await fetch(API_CONFIG.baseURL + '/api/v1/files/upload', {
                     method: 'POST',
-                    body: fileFormData
+                    body: fileFormData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 });
                 
+                if (!fileResponse.ok) {
+                    const contentType = fileResponse.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        const fileResult = await fileResponse.json();
+                        throw new Error(fileResult.message || 'Dosya yüklenirken hata oluştu');
+                    } else {
+                        throw new Error('Sunucu hatası: ' + fileResponse.status + ' ' + fileResponse.statusText);
+                    }
+                }
+
                 const fileResult = await fileResponse.json();
-                
-                if (fileResponse.ok && fileResult.success) {
+                if (fileResult.success) {
                     bloodTestFileUrl = API_CONFIG.baseURL + fileResult.data.files[0].url;
                     console.log('Dosya başarıyla yüklendi:', bloodTestFileUrl);
                 } else {

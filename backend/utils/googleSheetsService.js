@@ -1,58 +1,47 @@
 const { google } = require('googleapis');
-const path = require('path');
 const logger = require('./logger');
-
-
+require('dotenv').config();
 
 class GoogleSheetsService {
     constructor() {
-        this.sheets = null;
-        this.auth = null;
         this.spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
-        this.sheetName = process.env.GOOGLE_SHEET_NAME || 'Form Responses';
-        this.serviceAccountKeyFile = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE;
+        this.sheetName = process.env.GOOGLE_SHEET_NAME;
         this.initialized = false;
+        this.initializeAuth();
     }
 
-    async initialize() {
+    async initializeAuth() {
         try {
-            if (this.initialized) return;
-
-            if (!this.serviceAccountKeyFile) {
-                throw new Error('Google Service Account Key File bulunamadı. GOOGLE_SERVICE_ACCOUNT_KEY_FILE environment variable\'ını ayarlayın.');
-            }
-
-            if (!this.spreadsheetId) {
-                throw new Error('Google Spreadsheet ID bulunamadı. GOOGLE_SPREADSHEET_ID environment variable\'ını ayarlayın.');
-            }
-
-            // Service Account key dosyasının tam yolunu belirle
-            const keyFilePath = path.join(__dirname, '..', this.serviceAccountKeyFile);
-
-            // OAuth2 Service Account authentication
+            // Google Sheets API yapılandırması
             this.auth = new google.auth.GoogleAuth({
-                keyFile: keyFilePath,
-                scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+                credentials: {
+                    type: process.env.GOOGLE_SERVICE_ACCOUNT_TYPE,
+                    project_id: process.env.GOOGLE_PROJECT_ID,
+                    private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
+                    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+                    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+                    client_id: process.env.GOOGLE_CLIENT_ID,
+                    auth_uri: process.env.GOOGLE_AUTH_URI,
+                    token_uri: process.env.GOOGLE_TOKEN_URI,
+                    auth_provider_x509_cert_url: process.env.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
+                    client_x509_cert_url: process.env.GOOGLE_CLIENT_X509_CERT_URL,
+                    universe_domain: process.env.GOOGLE_UNIVERSE_DOMAIN
+                },
+                scopes: ['https://www.googleapis.com/auth/spreadsheets']
             });
 
-            // Sheets API istemcisi OAuth2 ile
-            this.sheets = google.sheets({ 
-                version: 'v4', 
-                auth: this.auth 
-            });
-            
+            this.sheets = google.sheets({ version: 'v4', auth: this.auth });
             this.initialized = true;
-
-            logger.info('Google Sheets service initialized successfully with OAuth2 Service Account');
+            logger.info('Google Sheets service initialized successfully');
         } catch (error) {
-            logger.error('Google Sheets service initialization failed:', error);
-            throw new Error(`Google Sheets service initialization failed: ${error.message}`);
+            logger.error('Error initializing Google Sheets service:', error);
+            throw error;
         }
     }
 
     async ensureSheetExists() {
         try {
-            if (!this.initialized) await this.initialize();
+            if (!this.initialized) await this.initializeAuth();
 
             // Spreadsheet bilgilerini al
             const spreadsheet = await this.sheets.spreadsheets.get({
@@ -60,11 +49,11 @@ class GoogleSheetsService {
             });
 
             // Sheet var mı kontrol et
-            const sheetExists = spreadsheet.data.sheets.some(
+            const existingSheet = spreadsheet.data.sheets.find(
                 sheet => sheet.properties.title === this.sheetName
             );
 
-            if (!sheetExists) {
+            if (!existingSheet) {
                 // Sheet oluştur
                 await this.sheets.spreadsheets.batchUpdate({
                     spreadsheetId: this.spreadsheetId,
@@ -80,14 +69,21 @@ class GoogleSheetsService {
                 });
 
                 logger.info(`Sheet "${this.sheetName}" created successfully`);
+            } else {
+                logger.info(`Sheet "${this.sheetName}" already exists, using existing sheet`);
             }
 
             // Header satırını kontrol et ve ekle
             await this.ensureHeaders();
 
         } catch (error) {
-            logger.error('Error ensuring sheet exists:', error);
-            throw error;
+            if (error.message && error.message.includes('already exists')) {
+                logger.info(`Sheet "${this.sheetName}" already exists, proceeding with existing sheet`);
+                await this.ensureHeaders();
+            } else {
+                logger.error('Error ensuring sheet exists:', error);
+                throw error;
+            }
         }
     }
 
@@ -196,7 +192,7 @@ class GoogleSheetsService {
 
     async addFormData(formData, metadata = {}) {
         try {
-            if (!this.initialized) await this.initialize();
+            if (!this.initialized) await this.initializeAuth();
             await this.ensureSheetExists();
 
             const values = this.formatFormData(formData, metadata);
@@ -230,7 +226,7 @@ class GoogleSheetsService {
 
     async getFormData(range = null) {
         try {
-            if (!this.initialized) await this.initialize();
+            if (!this.initialized) await this.initializeAuth();
 
             const queryRange = range || `${this.sheetName}!A:X`;
 
@@ -326,7 +322,7 @@ class GoogleSheetsService {
 
     async testConnection() {
         try {
-            if (!this.initialized) await this.initialize();
+            if (!this.initialized) await this.initializeAuth();
 
             const response = await this.sheets.spreadsheets.get({
                 spreadsheetId: this.spreadsheetId,
