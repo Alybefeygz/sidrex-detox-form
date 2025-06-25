@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online WhatsApp Grubu Başvuru-Bilgi Formu</title>
+    
+    <!-- Production Config Meta Tags -->
+    <meta name="backend-url" content="">
+    <meta name="environment" content="production">
+    
+    <!-- Security Headers for iframe -->
+    <meta http-equiv="X-Frame-Options" content="ALLOWALL">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors *;">
+    
+    <!-- SEO and Social Meta Tags -->
+    <meta name="description" content="Sidrex Detox Form - Online WhatsApp Grubu Başvuru ve Bilgi Formu">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ONLINE WHATSAPP GRUBU BAŞVURU-BİLGİ FORMU</h1>
+        </header>
+
+        <form id="applicationForm" class="application-form">
+            <!-- Kişisel Bilgiler -->
+            <fieldset class="form-section">
+                <legend>Kişisel Bilgiler</legend>
+                
+                <div class="form-group">
+                    <label for="fullName">Ad - Soyad *</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="age">Yaş *</label>
+                        <input type="number" id="age" name="age" min="18" max="100" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="height">Boy (cm) *</label>
+                        <input type="number" id="height" name="height" min="120" max="250" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="weight">Kilo (kg) *</label>
+                        <input type="number" id="weight" name="weight" min="30" max="300" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="occupation">Meslek / Günlük yaşam tarzı *</label>
+                    <input type="text" id="occupation" name="occupation" placeholder="masa başı, aktif, öğrenci vb." required>
+                </div>
+            </fieldset>
+
+            <!-- Sağlık Durumu -->
+            <fieldset class="form-section">
+                <legend>Sağlık Durumu</legend>
+                
+                <div class="form-group">
+                    <label>Aşağıdaki durumlardan biri sizde mevcut mu? *</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="healthConditions" value="heart_disease">
+                            Kalp hastalığı veya kalp pili kullanımı
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="healthConditions" value="type1_diabetes">
+                            Tip 1 diyabet
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="healthConditions" value="organ_failure">
+                            Organ yetmezliği (böbrek, karaciğer vs.)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="healthConditions" value="cancer_treatment">
+                            Aktif kanser tedavisi görüyorum
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="healthConditions" value="eating_disorder">
+                            Yeme bozukluğu öyküm var (anoreksiya, bulimia vb.)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="healthConditions" value="psychiatric_medication">
+                            Ruhsal hastalık nedeniyle düzenli ilaç kullanıyorum
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="healthConditions" value="pregnancy">
+                            Hamileyim / Yüksek riskli gebelik durumum var
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="healthConditions" value="absorption_disorder">
+                            Emilim bozukluğu / bağırsak hastalığım var (örn. Crohn, Çölyak vb.)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="healthConditions" value="bariatric_surgery">
+                            Bariatrik cerrahi (tüp mide, mide balonu, vb.) geçirdim
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="healthConditions" value="none">
+                            Yukarıdakilerden biri yok / Hiçbiri bana uymuyor
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Daha önce tespit edilen bir vitamin veya mineral eksikliğiniz oldu mu?</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vitaminDeficiency" value="vitamin_d">
+                            D vitamini
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vitaminDeficiency" value="vitamin_b12">
+                            B12 vitamini
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vitaminDeficiency" value="iron">
+                            Demir
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vitaminDeficiency" value="magnesium">
+                            Magnezyum
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vitaminDeficiency" value="folic_acid">
+                            Folik Asit
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vitaminDeficiency" value="zinc">
+                            Çinko
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vitaminDeficiency" value="calcium">
+                            Kalsiyum
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vitaminDeficiency" value="other">
+                            Diğer
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vitaminDeficiency" value="dont_know">
+                            Bilmiyorum / Test yaptırmadım
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="vitaminDeficiency" value="none">
+                            Yok
+                        </label>
+                    </div>
+                    
+                    <!-- Diğer vitamin eksikliği alanı -->
+                    <div id="otherVitaminDeficiency" class="conditional-field" style="display: none;">
+                        <label for="otherVitaminDeficiencyText">Diğer vitamin/mineral eksikliği:</label>
+                        <input type="text" id="otherVitaminDeficiencyText" name="otherVitaminDeficiencyText">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Son 6 ay içinde vitamin-mineral düzeylerinize dair bir kan testi yaptırdınız mı? *</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="bloodTest" value="yes" required>
+                            Evet
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="bloodTest" value="no" required>
+                            Hayır
+                        </label>
+                    </div>
+                    
+                    <!-- Kan testi sonuçları dosya yükleme alanı -->
+                    <div id="bloodTestResults" class="conditional-field" style="display: none;">
+                        <label for="bloodTestFile">Varsa sonuçları yükleyin:</label>
+                        <input type="file" id="bloodTestFile" name="bloodTestFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        <small>Desteklenen formatlar: PDF, JPG, PNG, DOC, DOCX</small>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Kronik Hastalıklar -->
+            <fieldset class="form-section">
+                <legend>Kronik Hastalıklar</legend>
+                
+                <div class="form-group">
+                    <label>Kronik bir hastalığınız var mı?</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="hypothyroid">
+                            Hipotiroidi / Hashimoto
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="hypertension">
+                            Hipertansiyon
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="diabetes_type1">
+                            Diyabet (Tip 1)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="diabetes_type2">
+                            Diyabet (Tip 2)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="insulin_resistance">
+                            İnsülin Direnci / Prediyabet
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="pcos">
+                            PCOS (Polikistik Over Sendromu)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="reflux">
+                            Reflü / Gastrit / Ülser
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="celiac">
+                            Çölyak / Gluten intoleransı
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="lactose_intolerance">
+                            Laktoz intoleransı
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="migraine">
+                            Migren
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="anemia">
+                            Anemi (Kansızlık)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="fatty_liver">
+                            Karaciğer yağlanması
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="autoimmune">
+                            Otoimmün hastalıklar (örn. SLE, RA)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="other">
+                            Diğer
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="chronicDiseases" value="none">
+                            Yok
+                        </label>
+                    </div>
+                    
+                    <!-- Diğer kronik hastalık alanı -->
+                    <div id="otherChronicDisease" class="conditional-field" style="display: none;">
+                        <label for="otherChronicDiseaseText">Diğer kronik hastalık:</label>
+                        <input type="text" id="otherChronicDiseaseText" name="otherChronicDiseaseText">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Düzenli kullandığınız ilaçlar var mı? *</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="regularMedication" value="yes" required>
+                            Evet
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="regularMedication" value="no" required>
+                            Hayır
+                        </label>
+                    </div>
+                    
+                    <!-- İlaç detayları alanı -->
+                    <div id="medicationDetails" class="conditional-field" style="display: none;">
+                        <label for="medicationList">Lütfen ilaç adlarını ve ne için kullandığınızı belirtiniz:</label>
+                        <textarea id="medicationList" name="medicationList" rows="4" placeholder="İlaç adı - Kullanım amacı"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Daha önce geçirdiğiniz ameliyat veya operasyonlar var mı? *</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="pastSurgery" value="yes" required>
+                            Evet
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="pastSurgery" value="no" required>
+                            Hayır
+                        </label>
+                    </div>
+                    
+                    <!-- Ameliyat detayları alanı -->
+                    <div id="surgeryDetails" class="conditional-field" style="display: none;">
+                        <label for="surgeryList">Açıklayınız (tarih / neden):</label>
+                        <textarea id="surgeryList" name="surgeryList" rows="4" placeholder="Tarih - Ameliyat türü - Neden"></textarea>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Alerjiler ve İntoleranslar -->
+            <fieldset class="form-section">
+                <legend>Alerjiler ve İntoleranslar</legend>
+                
+                <div class="form-group">
+                    <label>Alerjiniz veya gıda intoleransınız var mı?</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="allergies" value="lactose">
+                            Laktoz
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="allergies" value="gluten">
+                            Gluten
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="allergies" value="egg_white">
+                            Yumurtanın beyazı
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="allergies" value="egg_yolk">
+                            Yumurtanın sarısı
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="allergies" value="nuts">
+                            Kuruyemiş
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="allergies" value="seafood">
+                            Deniz ürünleri
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="allergies" value="other">
+                            Diğer
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="allergies" value="none">
+                            Yok
+                        </label>
+                    </div>
+                    
+                    <!-- Kuruyemiş detayı alanı -->
+                    <div id="nutsDetail" class="conditional-field" style="display: none;">
+                        <label for="nutsDetailText">Hangi kuruyemiş:</label>
+                        <input type="text" id="nutsDetailText" name="nutsDetailText" placeholder="Fındık, ceviz, fıstık vb.">
+                    </div>
+                    
+                    <!-- Diğer alerji alanı -->
+                    <div id="otherAllergy" class="conditional-field" style="display: none;">
+                        <label for="otherAllergyText">Diğer alerji/intolerans:</label>
+                        <input type="text" id="otherAllergyText" name="otherAllergyText">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Sindirim sistemi ile ilgili sıkıntılar yaşıyor musunuz?</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="digestiveIssues" value="constipation">
+                            Kabızlık
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="digestiveIssues" value="bloating">
+                            Şişkinlik / gaz
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="digestiveIssues" value="diarrhea">
+                            İshal
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="digestiveIssues" value="heartburn">
+                            Mide yanması / reflü
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="digestiveIssues" value="ibs">
+                            Hassas bağırsak sendromu (IBS)
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="digestiveIssues" value="none">
+                            Yok
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Vücut Yapısı ve Diyet Alışkanlıkları -->
+            <fieldset class="form-section">
+                <legend>Vücut Yapısı ve Diyet Alışkanlıkları</legend>
+                
+                <div class="form-group">
+                    <label>Vücudunuzu nasıl tanımlarsınız? *</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="bodyType" value="apple" required>
+                            Bel çevrem kalındır, karın bölgemden kilo alırım
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="bodyType" value="pear" required>
+                            Kalçalarım/genel alt bedenim daha geniş
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="bodyType" value="balanced" required>
+                            Tüm vücudumda dengeli kilo alırım
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="bodyType" value="thin_regional" required>
+                            Zayıfım ama bölgesel yağlanmam var
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="bodyType" value="muscular_edema" required>
+                            Kaslıyım ama biraz ödemliyim
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="bodyType" value="other" required>
+                            Diğer
+                        </label>
+                    </div>
+                    
+                    <!-- Diğer vücut tipi alanı -->
+                    <div id="otherBodyType" class="conditional-field" style="display: none;">
+                        <label for="otherBodyTypeText">Vücut tipinizi açıklayın:</label>
+                        <input type="text" id="otherBodyTypeText" name="otherBodyTypeText">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Diyet yaparken en çok ne zorlar? (3 seçeneğe kadar işaretleyin)</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="dietChallenges" value="sweet_craving">
+                            Tatlı isteği
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="dietChallenges" value="bread_pasta">
+                            Ekmeği/hamur işini bırakmak
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="dietChallenges" value="social_eating">
+                            Sosyal ortamlarda diyet sürdürmek
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="dietChallenges" value="skipping_meals">
+                            Öğün atlamak
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="dietChallenges" value="motivation">
+                            Yetersiz motivasyon
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="dietChallenges" value="water_intake">
+                            Su içmeyi unutmak
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="dietChallenges" value="meal_prep">
+                            Hazırlık yapmaya vakit bulamamak
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="dietChallenges" value="emotional_eating">
+                            Duygusal yeme / stres yeme
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="dietChallenges" value="other">
+                            Diğer
+                        </label>
+                    </div>
+                    
+                    <!-- Diğer zorluk alanı -->
+                    <div id="otherDietChallenge" class="conditional-field" style="display: none;">
+                        <label for="otherDietChallengeText">Diğer zorluk:</label>
+                        <input type="text" id="otherDietChallengeText" name="otherDietChallengeText">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Diyete ne kadar hazırsınız? *</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="dietReadiness" value="very_excited" required>
+                            Başlamak için çok heyecanlıyım!
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="dietReadiness" value="determined_need_support" required>
+                            Kararlıyım ama biraz desteğe ihtiyacım var
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="dietReadiness" value="undecided_hope_motivation" required>
+                            Kararsızım, bu grupta motive olmayı umuyorum
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="dietReadiness" value="last_chance" required>
+                            Daha önce çok denedim, son şansım gibi hissediyorum
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="dietReadiness" value="just_trying" required>
+                            Sadece denemek istiyorum, sonucu göreceğim
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="personalNote">Kendinle ilgili paylaşmak istediğin özel bir notun var mı?</label>
+                    <textarea id="personalNote" name="personalNote" rows="4" placeholder="Kendini daha iyi tanıtmana yardımcı olacak her şey olabilir"></textarea>
+                </div>
+            </fieldset>
+
+            <!-- Beslenme Alışkanlıkları -->
+            <fieldset class="form-section">
+                <legend>Beslenme Alışkanlıkları</legend>
+                
+                <div class="form-group">
+                    <label>Günde kaç öğün tüketiyorsunuz? *</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="mealsPerDay" value="1" required>
+                            1
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="mealsPerDay" value="2" required>
+                            2
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="mealsPerDay" value="3" required>
+                            3
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="mealsPerDay" value="more_than_3" required>
+                            3'ten fazla
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="mealsPerDay" value="irregular" required>
+                            Düzenli değil / Karışık
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Ana öğünler dışında sık ara öğün yapar mısınız? *</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="snacking" value="yes" required>
+                            Evet
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="snacking" value="no" required>
+                            Hayır
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="snacking" value="sometimes" required>
+                            Bazen
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Günlük ortalama su tüketiminiz nedir? *</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="waterIntake" value="0-1" required>
+                            0–1 litre
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="waterIntake" value="1-1.5" required>
+                            1–1.5 litre
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="waterIntake" value="1.5-2" required>
+                            1.5–2 litre
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="waterIntake" value="2+" required>
+                            2 litreden fazla
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="waterIntake" value="dont_know" required>
+                            Bilmiyorum / Takip etmiyorum
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Form Gönderme -->
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">Başvuru Formunu Gönder</button>
+                <button type="reset" class="reset-btn">Formu Temizle</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Configuration and Scripts -->
+    <script src="config.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
