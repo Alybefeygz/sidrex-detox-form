@@ -122,6 +122,8 @@ class GoogleSheetsService {
                 'Günlük Öğün Sayısı',
                 'Ara Öğün',
                 'Su Tüketimi',
+                'Katılımcı Aydınlatma Metnini',
+                'Katılımcı Açık Rıza Metnini',
                 'IP Adresi',
                 'User Agent'
             ];
@@ -130,7 +132,7 @@ class GoogleSheetsService {
             if (!response.data.values || response.data.values.length === 0) {
                 await this.sheets.spreadsheets.values.update({
                     spreadsheetId: this.spreadsheetId,
-                    range: `${this.sheetName}!A1:X1`,
+                    range: `${this.sheetName}!A1:Z1`,
                     valueInputOption: 'RAW',
                     requestBody: {
                         values: [headers]
@@ -174,6 +176,8 @@ class GoogleSheetsService {
             this.formatSingleField(formData.mealsPerDay, 'mealsPerDay'),
             this.formatSingleField(formData.snacking, 'snacking'),
             this.formatSingleField(formData.waterIntake, 'waterIntake'),
+            formData.aydinlatmaMetni || '',
+            formData.acikRizaMetni || '',
             metadata.ipAddress || '',
             metadata.userAgent || ''
         ];

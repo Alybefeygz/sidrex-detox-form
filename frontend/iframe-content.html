@@ -580,12 +580,67 @@
                 </div>
             </fieldset>
 
+            <!-- KVKK Onayları -->
+            <fieldset class="form-section">
+                <legend>KVKK ve Aydınlatma Metinleri</legend>
+                
+
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <label class="checkbox-label required-checkbox">
+                            <input type="checkbox" id="aydinlatmaMetni" name="aydinlatmaMetni" required>
+                            <strong>Katılımcı Aydınlatma Metnini okudum, anladım ve onaylıyorum.</strong>
+                        </label>
+                        <label class="checkbox-label required-checkbox">
+                            <input type="checkbox" id="acikRizaMetni" name="acikRizaMetni" required>
+                            <strong>Katılımcı Açık Rıza Metnini okudum, anladım ve onaylıyorum.</strong>
+                        </label>
+                    </div>
+                    <small style="color: #666; font-size: 0.875rem;">
+                        Bu onaylar zorunludur. Formu göndermek için her iki metni de okumuş ve onaylamış olmanız gerekmektedir.
+                    </small>
+                </div>
+            </fieldset>
+
             <!-- Form Gönderme -->
             <div class="form-actions">
                 <button type="submit" class="submit-btn">Başvuru Formunu Gönder</button>
                 <button type="reset" class="reset-btn">Formu Temizle</button>
             </div>
         </form>
+    </div>
+
+    <!-- Aydınlatma Metni Popup -->
+    <div id="aydinlatmaMetniPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-container">
+            <div class="popup-header">
+                <h3>Katılımcı Aydınlatma Metni</h3>
+                <button type="button" class="popup-close-btn" onclick="closeAydinlatmaPopup()">&times;</button>
+            </div>
+            <div class="popup-body">
+                <iframe id="aydinlatmaIframe" src="sidrex-aydinlatma-metni.html" frameborder="0"></iframe>
+            </div>
+            <div class="popup-footer">
+                <button type="button" class="popup-action-btn" onclick="closeAydinlatmaPopup()">Okudum, Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rıza Metni Popup -->
+    <div id="rizaMetniPopup" class="popup-overlay" style="display: none;">
+        <div class="popup-container">
+            <div class="popup-header">
+                <h3>Katılımcı Açık Rıza Metni</h3>
+                <button type="button" class="popup-close-btn" onclick="closeRizaPopup()">&times;</button>
+            </div>
+            <div class="popup-body">
+                <iframe id="rizaIframe" src="sidrex-rıza-metni.html" frameborder="0"></iframe>
+            </div>
+            <div class="popup-footer">
+                <button type="button" class="popup-action-btn" onclick="closeRizaPopup()">Okudum, Kapat</button>
+            </div>
+        </div>
     </div>
 
     <!-- Configuration and Scripts -->

@@ -23,8 +23,17 @@ const authenticateAdmin = async (req, res, next) => {
             });
         }
 
+        // JWT Secret güvenlik kontrolü
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret || jwtSecret === 'default_secret') {
+            return res.status(500).json({
+                success: false,
+                message: 'JWT yapılandırması güvenli değil'
+            });
+        }
+
         // Verify JWT token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret');
+        const decoded = jwt.verify(token, jwtSecret);
         
         // Check if user has admin role
         if (decoded.role !== 'admin') {
@@ -76,7 +85,15 @@ const optionalAuth = async (req, res, next) => {
             const token = authHeader.replace('Bearer ', '');
             
             if (token) {
-                const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret');
+                const jwtSecret = process.env.JWT_SECRET;
+                if (!jwtSecret || jwtSecret === 'default_secret') {
+                    return res.status(500).json({
+                        success: false,
+                        message: 'JWT yapılandırması güvenli değil'
+                    });
+                }
+                
+                const decoded = jwt.verify(token, jwtSecret);
                 req.admin = {
                     email: decoded.email,
                     role: decoded.role,
