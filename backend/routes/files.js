@@ -310,6 +310,68 @@ router.get('/', async (req, res) => {
     }
 });
 
+// PDF dokümantlarını serve etmek için yeni endpoint
+router.get('/documents/:docType', async (req, res) => {
+    try {
+        const { docType } = req.params;
+        let filename = '';
+        
+        switch(docType) {
+            case 'aydinlatma':
+                filename = 'SİDREX DETOX KAMPI AYDINLATMA METNİ_REV2.pdf';
+                break;
+            case 'riza':
+                filename = 'SİRDREX DETOX KULLANICI AÇIK RIZA METNİ_REV.pdf';
+                break;
+            default:
+                return res.status(404).json({
+                    success: false,
+                    message: 'Doküman bulunamadı'
+                });
+        }
+        
+        const filePath = path.join(__dirname, '../../frontend/documents', filename);
+        
+        // Dosya kontrolü
+        try {
+            await fs.access(filePath);
+        } catch (error) {
+            logger.error(`PDF doküman dosyası bulunamadı: ${filePath}`);
+            return res.status(404).json({
+                success: false,
+                message: 'Doküman dosyası bulunamadı'
+            });
+        }
+        
+        // Iframe için gerekli headers
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'inline');
+        res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+        res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 saat cache
+        
+        // CORS headers for iframe embedding
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        
+        // PDF dosyasını stream et
+        const fileStream = require('fs').createReadStream(filePath);
+        fileStream.pipe(res);
+        
+        logger.info(`PDF doküman erişimi: ${filename}`, {
+            userAgent: req.get('User-Agent'),
+            ip: req.ip
+        });
+        
+    } catch (error) {
+        logger.error('PDF doküman erişim hatası:', error);
+        res.status(500).json({
+            success: false,
+            message: 'PDF yüklenirken hata oluştu'
+        });
+    }
+});
+
 // Helper function to format file size
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';

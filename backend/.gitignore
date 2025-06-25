@@ -157,7 +157,11 @@ coverage/
 !/logs/.gitkeep
 
 # Google Service Account Keys - CRITICAL SECURITY
-*.json
+# Sadece service account key dosyalarını ignore et, package.json vs'yi değil
+*service-account*.json
+*credentials*.json
+*auth*.json
+sidrex-form-*.json
 !google-service-account-key.example.json
 
 # Production Environment Files - CRITICAL SECURITY

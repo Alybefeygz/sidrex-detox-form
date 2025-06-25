@@ -53,6 +53,9 @@ function getApiBaseUrl() {
 // DOM içeriği yüklendiğinde çalışacak ana fonksiyon
 document.addEventListener('DOMContentLoaded', function() {
     initializeForm();
+    setupPDFModal();
+    setupAydinlatmaPopup();
+    setupRizaPopup();
 });
 
 function initializeForm() {
@@ -346,6 +349,26 @@ function setupFormValidation() {
         // Event listener'ın eklendiğini işaretle
         resetBtn.dataset.eventListenerAdded = 'true';
     }
+    
+    // KVKK checkbox validasyonu için event listener'lar ekle
+    const aydinlatmaMetni = document.getElementById('aydinlatmaMetni');
+    const acikRizaMetni = document.getElementById('acikRizaMetni');
+    
+    if (aydinlatmaMetni) {
+        aydinlatmaMetni.addEventListener('change', function() {
+            if (this.checked) {
+                clearFieldError(this);
+            }
+        });
+    }
+    
+    if (acikRizaMetni) {
+        acikRizaMetni.addEventListener('change', function() {
+            if (this.checked) {
+                clearFieldError(this);
+            }
+        });
+    }
 }
 
 // Form doğrulama fonksiyonu
@@ -364,14 +387,25 @@ function validateForm() {
                 showFieldError(field, 'Lütfen bir seçenek seçin.');
                 isValid = false;
             }
+        } else {
+            // Alan geçerliyse hata mesajını temizle
+            clearFieldError(field);
         }
     });
+    
+    // KVKK Onayları kontrolü - yeni validateKVKKApproval fonksiyonunu kullan
+    const kvkkValid = validateKVKKApproval();
+    if (!kvkkValid) {
+        isValid = false;
+    }
     
     // Yaş kontrolü
     const ageField = document.getElementById('age');
     if (ageField.value && (ageField.value < 18 || ageField.value > 100)) {
         showFieldError(ageField, 'Yaş 18-100 arasında olmalıdır.');
         isValid = false;
+    } else if (ageField.value) {
+        clearFieldError(ageField);
     }
     
     return isValid;
@@ -642,6 +676,13 @@ function collectFormData(form) {
         delete data.otherDietChallengeText;
     }
     
+    // KVKK Onaylarını ekle
+    const aydinlatmaMetni = document.getElementById('aydinlatmaMetni');
+    const acikRizaMetni = document.getElementById('acikRizaMetni');
+    
+    data.aydinlatmaMetni = aydinlatmaMetni.checked ? 'Onaylandı' : 'Onaylanmadı';
+    data.acikRizaMetni = acikRizaMetni.checked ? 'Onaylandı' : 'Onaylanmadı';
+    
     // Sayısal alanları number tipine çevir
     const numberFields = ['age', 'height', 'weight'];
     numberFields.forEach(field => {
@@ -897,3 +938,285 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// PDF Container fonksiyonları
+function setupPDFModal() {
+    // Bu fonksiyon artık gerekli değil ama mevcut çağrıları bozmamak için bırakıyoruz
+    console.log('PDF sistem hazır - yeni sekmede açılacak');
+}
+
+// PDF indirme fonksiyonu
+function openPDFNewTab(type) {
+    let pdfPath = '';
+    let titleText = '';
+    let fileName = '';
+    
+    switch(type) {
+        case 'aydinlatma':
+            pdfPath = './documents/SİDREX DETOX KAMPI AYDINLATMA METNİ_REV2.pdf';
+            titleText = 'Sidrex Detox Kampı Aydınlatma Metni';
+            fileName = 'Sidrex_Aydinlatma_Metni.pdf';
+            break;
+        case 'riza':
+            pdfPath = './documents/SİRDREX DETOX KULLANICI AÇIK RIZA METNİ_REV.pdf';
+            titleText = 'Sidrex Detox Kullanıcı Açık Rıza Metni';
+            fileName = 'Sidrex_Acik_Riza_Metni.pdf';
+            break;
+        default:
+            console.error('Geçersiz PDF türü:', type);
+            return;
+    }
+    
+    // PDF'i indirme linkini oluştur
+    const link = document.createElement('a');
+    link.href = pdfPath;
+    link.download = fileName;
+    link.target = '_blank';
+    
+    // Link'i DOM'a ekle, tıkla ve kaldır
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Kullanıcıya bilgi ver
+    showPDFInfo(titleText, 'download');
+    
+    console.log('PDF indirme başlatıldı:', titleText);
+}
+
+// PDF açıldığında bilgi mesajı göster
+function showPDFInfo(titleText) {
+    // Mevcut bilgi mesajını kaldır
+    const existingInfo = document.querySelector('.pdf-info-message');
+    if (existingInfo) {
+        existingInfo.remove();
+    }
+    
+    // Yeni bilgi mesajı oluştur
+    const infoMessage = document.createElement('div');
+    infoMessage.className = 'pdf-info-message';
+    infoMessage.innerHTML = `
+        <div class="pdf-info-content">
+            ✅ <strong>${titleText}</strong> yeni sekmede açıldı.
+            <br>
+            <small>Dokümanı okuduktan sonra bu sekmeye geri dönüp onayları işaretleyebilirsiniz.</small>
+        </div>
+    `;
+    
+    // Documents section'a ekle
+    const documentsSection = document.querySelector('.documents-section');
+    if (documentsSection) {
+        documentsSection.appendChild(infoMessage);
+        
+        // 5 saniye sonra mesajı otomatik kaldır
+        setTimeout(() => {
+            if (infoMessage && infoMessage.parentNode) {
+                infoMessage.remove();
+            }
+        }, 5000);
+    }
+}
+
+// Eski inline fonksiyonları - geriye dönük uyumluluk için
+function openPDFInline(type) {
+    // Yeni sekmede açmaya yönlendir
+    openPDFNewTab(type);
+}
+
+function closePDFInline() {
+    // Artık kullanılmıyor
+    console.log('Inline PDF kapatma - artık kullanılmıyor');
+}
+
+// KVKK validasyon fonksiyonlarını güncelle
+function validateKVKKApproval() {
+    const aydinlatmaMetni = document.getElementById('aydinlatmaMetni');
+    const acikRizaMetni = document.getElementById('acikRizaMetni');
+    let isValid = true;
+    
+    if (!aydinlatmaMetni.checked) {
+        showFieldError(aydinlatmaMetni, 'Katılımcı Aydınlatma Metnini okumanız ve onaylamanız zorunludur.');
+        isValid = false;
+    } else {
+        clearFieldError(aydinlatmaMetni);
+    }
+    
+    if (!acikRizaMetni.checked) {
+        showFieldError(acikRizaMetni, 'Katılımcı Açık Rıza Metnini okumanız ve onaylamanız zorunludur.');
+        isValid = false;
+    } else {
+        clearFieldError(acikRizaMetni);
+    }
+    
+    return isValid;
+}
+
+// Hata mesajını temizleme fonksiyonu
+function clearFieldError(field) {
+    // Hata mesajını kaldır
+    const existingError = field.parentNode.querySelector('.field-error');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Hata stillerini kaldır
+    field.classList.remove('error');
+    if (field.type === 'checkbox' || field.type === 'radio') {
+        const labels = field.closest('.checkbox-group, .radio-group')?.querySelectorAll('label');
+        labels?.forEach(label => label.classList.remove('error'));
+    }
+}
+
+// Aydınlatma Metni Popup Fonksiyonları
+function setupAydinlatmaPopup() {
+    const aydinlatmaCheckbox = document.getElementById('aydinlatmaMetni');
+    
+    if (aydinlatmaCheckbox) {
+        aydinlatmaCheckbox.addEventListener('click', function(e) {
+            // Checkbox'ın işaretlenmesini engelle
+            e.preventDefault();
+            
+            // Popup'ı aç
+            openAydinlatmaPopup();
+        });
+    }
+}
+
+function openAydinlatmaPopup() {
+    const popup = document.getElementById('aydinlatmaMetniPopup');
+    if (popup) {
+        popup.style.display = 'flex';
+        
+        // Body scroll'unu engelle
+        document.body.style.overflow = 'hidden';
+        
+        // ESC tuşu ile kapatma
+        document.addEventListener('keydown', handleEscapeKey);
+        
+        // Popup dışına tıklama ile kapatma
+        popup.addEventListener('click', handleOutsideClick);
+        
+        console.log('Aydınlatma metni popup açıldı');
+    }
+}
+
+function closeAydinlatmaPopup() {
+    const popup = document.getElementById('aydinlatmaMetniPopup');
+    const checkbox = document.getElementById('aydinlatmaMetni');
+    
+    if (popup) {
+        popup.style.display = 'none';
+        
+        // Body scroll'unu geri aç
+        document.body.style.overflow = '';
+        
+        // Event listener'ları kaldır
+        document.removeEventListener('keydown', handleEscapeKey);
+        popup.removeEventListener('click', handleOutsideClick);
+        
+        // Checkbox'ı işaretle
+        if (checkbox) {
+            checkbox.checked = true;
+            
+            // Checkbox'a tıklama eventini geçici olarak kaldır
+            const newCheckbox = checkbox.cloneNode(true);
+            checkbox.parentNode.replaceChild(newCheckbox, checkbox);
+            
+            // Yeni checkbox'a normal davranış ekle
+            setTimeout(() => {
+                setupAydinlatmaPopup();
+            }, 100);
+        }
+        
+        console.log('Aydınlatma metni popup kapatıldı ve onay verildi');
+    }
+}
+
+function handleEscapeKey(e) {
+    if (e.key === 'Escape') {
+        closeAydinlatmaPopup();
+    }
+}
+
+function handleOutsideClick(e) {
+    if (e.target === e.currentTarget) {
+        closeAydinlatmaPopup();
+    }
+}
+
+// Rıza Metni Popup Fonksiyonları
+function setupRizaPopup() {
+    const rizaCheckbox = document.getElementById('acikRizaMetni');
+    
+    if (rizaCheckbox) {
+        rizaCheckbox.addEventListener('click', function(e) {
+            // Checkbox'ın işaretlenmesini engelle
+            e.preventDefault();
+            
+            // Popup'ı aç
+            openRizaPopup();
+        });
+    }
+}
+
+function openRizaPopup() {
+    const popup = document.getElementById('rizaMetniPopup');
+    if (popup) {
+        popup.style.display = 'flex';
+        
+        // Body scroll'unu engelle
+        document.body.style.overflow = 'hidden';
+        
+        // ESC tuşu ile kapatma
+        document.addEventListener('keydown', handleRizaEscapeKey);
+        
+        // Popup dışına tıklama ile kapatma
+        popup.addEventListener('click', handleRizaOutsideClick);
+        
+        console.log('Rıza metni popup açıldı');
+    }
+}
+
+function closeRizaPopup() {
+    const popup = document.getElementById('rizaMetniPopup');
+    const checkbox = document.getElementById('acikRizaMetni');
+    
+    if (popup) {
+        popup.style.display = 'none';
+        
+        // Body scroll'unu geri aç
+        document.body.style.overflow = '';
+        
+        // Event listener'ları kaldır
+        document.removeEventListener('keydown', handleRizaEscapeKey);
+        popup.removeEventListener('click', handleRizaOutsideClick);
+        
+        // Checkbox'ı işaretle
+        if (checkbox) {
+            checkbox.checked = true;
+            
+            // Checkbox'a tıklama eventini geçici olarak kaldır
+            const newCheckbox = checkbox.cloneNode(true);
+            checkbox.parentNode.replaceChild(newCheckbox, checkbox);
+            
+            // Yeni checkbox'a normal davranış ekle
+            setTimeout(() => {
+                setupRizaPopup();
+            }, 100);
+        }
+        
+        console.log('Rıza metni popup kapatıldı ve onay verildi');
+    }
+}
+
+function handleRizaEscapeKey(e) {
+    if (e.key === 'Escape') {
+        closeRizaPopup();
+    }
+}
+
+function handleRizaOutsideClick(e) {
+    if (e.target === e.currentTarget) {
+        closeRizaPopup();
+    }
+}

@@ -25,7 +25,24 @@ router.post('/login', async (req, res) => {
 
         // Simple admin check (In production, use database)
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@sidrex.com';
-        const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+        const adminPassword = process.env.ADMIN_PASSWORD;
+
+        // JWT Secret kontrolü
+        const jwtSecret = process.env.JWT_SECRET;
+        
+        if (!adminPassword) {
+            return res.status(500).json({
+                success: false,
+                message: 'Admin şifresi yapılandırılmamış. ADMIN_PASSWORD environment variable\'ını ayarlayın.'
+            });
+        }
+
+        if (!jwtSecret || jwtSecret === 'default_secret') {
+            return res.status(500).json({
+                success: false,
+                message: 'JWT secret güvenli değil. JWT_SECRET environment variable\'ını güvenli bir değerle ayarlayın.'
+            });
+        }
 
         if (email !== adminEmail) {
             return res.status(401).json({
@@ -51,7 +68,7 @@ router.post('/login', async (req, res) => {
                 role: 'admin',
                 loginTime: new Date().toISOString()
             },
-            process.env.JWT_SECRET || 'default_secret',
+            jwtSecret,
             { expiresIn: process.env.JWT_EXPIRE || '7d' }
         );
 

@@ -213,4 +213,54 @@ Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
 
 ---
 
-**Not**: Bu sistem sağlık bilgileri topladığı için KVKK/GDPR uyumluluğunu sağlayın ve gerekli yasal onayları alın. 
+**Not**: Bu sistem sağlık bilgileri topladığı için KVKK/GDPR uyumluluğunu sağlayın ve gerekli yasal onayları alın.
+
+## 🔧 Kurulum
+
+### Backend Kurulumu
+
+1. **Dependencies yükleyin:**
+```bash
+cd backend
+npm install
+```
+
+2. **Environment dosyasını yapılandırın:**
+```bash
+# .env dosyasını oluşturun
+cp env.example .env
+
+# .env dosyasını düzenleyin ve gerekli değerleri doldurun
+```
+
+⚠️ **GÜVENLİK UYARISI:** Production ortamında mutlaka aşağıdaki değerleri değiştirin:
+- `JWT_SECRET`: `openssl rand -base64 32` komutu ile güvenli secret oluşturun
+- `ADMIN_PASSWORD`: Güçlü bir şifre belirleyin (min 12 karakter, özel karakter, sayı)
+- Google Service Account JSON dosyasını güvenli bir konumda saklayın
+
+## 🔐 Güvenlik
+
+### Kritik Güvenlik Kontrolleri
+
+Push yapmadan önce aşağıdakileri kontrol edin:
+
+1. **Hassas bilgiler commit edilmemiş olmalı:**
+   - `.env` dosyaları
+   - Service account JSON dosyaları
+   - Hardcode edilmiş şifreler/tokenlar
+
+2. **Environment Variables Kontrolü:**
+   ```bash
+   # Bu değerler production'da mutlaka ayarlanmalı:
+   JWT_SECRET=güvenli-rastgele-string
+   ADMIN_PASSWORD=güçlü-şifre
+   GOOGLE_SERVICE_ACCOUNT_KEY_FILE=path-to-json
+   ```
+
+3. **Güvenlik Taraması:**
+   ```bash
+   # Hassas bilgileri taramak için:
+   grep -r "password\|secret\|key\|token" --exclude-dir=node_modules .
+   ```
+
+## 🚀 Deployment
